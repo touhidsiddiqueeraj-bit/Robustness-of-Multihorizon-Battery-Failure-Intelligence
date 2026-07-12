@@ -1,0 +1,33 @@
+# Raw data
+battery_sens/battery_sens/data/
+battery_sens/calce/
+Revision/
+**/Revision/
+data/synthetic/*.csv
+
+# Trained models
+models/*.joblib
+battery_sens/battery_sens/models/*.joblib
+
+# Python cache
+__pycache__/
+*.pyc
+**/__pycache__/**
+**/*.pyc
+**/New folder/**
+**/New folder.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# LaTeX build
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz

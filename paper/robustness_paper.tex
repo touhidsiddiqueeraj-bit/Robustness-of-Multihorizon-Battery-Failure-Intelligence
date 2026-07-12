@@ -1,0 +1,274 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{parskip}
+\usepackage{setspace}
+
+\onehalfspacing
+
+\title{How Far Does the Model Hold?\\
+Robustness of Multihorizon Battery Failure Intelligence\\
+Under Realistic Operating Conditions}
+
+\author{Tareq Anwar Shikdar and Hannu Laaksonen\\
+Flexible Energy Resources / Electrical Engineering,\\
+School of Technology and Innovations, University of Vaasa, Finland\\
+\{tareq.shikdar, hannu.laaksonen\}@uwasa.fi}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Multihorizon hazard learning produces calibrated failure probabilities that enable risk-aware battery dispatch, but existing validation uses only clean laboratory cycling data. We test whether calibration survives under realistic operating conditions. Using the published XGBoost hazard model trained on NASA 18650 data, we generate synthetic perturbed profiles at four severity levels by truncating raw discharge curves to simulate partial cycling (DoD 15--100\%), adding temperature noise ($\sigma=0.5$--$3.0^\circ$C), and randomizing rest effects. The fixed model's calibration degrades substantially across all four horizons (10, 20, 30, 50 cycles): ECE rises from 0.01--0.03 to 0.27--0.38, while AUC drops from 0.99--1.00 to 0.63--0.76. Degradation saturates at the mildest perturbation---even minimal partial cycling causes near-maximal calibration loss. Recalibrating the isotonic regression on a 10\% operational sample reduces ECE to 0.05--0.09, recovering 75--81\% of the gap. Calibration is not inherently robust to observational shifts, but a minimal recalibration step suffices for field deployment.
+\end{abstract}
+
+\section{Introduction}
+
+Battery energy storage systems (BESSs) are dispatched for flexibility services in renewable-dominated power systems. Operators need to know not just how much energy a battery can deliver, but whether it can reliably complete a scheduled service. The multihorizon hazard learning framework~\cite{shikdar2026learning} addresses this by estimating the probability of failure within predefined service horizons (10, 20, 30, 50 cycles). With isotonic regression calibration, it achieved a 71\% reduction in operational failures (from 10.3\% to 2.95\%) in cross-validated lab experiments.
+
+But the model was trained exclusively on clean laboratory data---full cycles at fixed C-rates, consistent rest periods, controlled temperatures. Real BESS operation involves partial cycles at varying depths of discharge (DoD), irregular loads, random rest periods, and temperature fluctuations. The calibration quality under these conditions is unknown, and no operator can trust a model whose reliability degrades in uncharacterized ways.
+
+This paper tests whether calibration survives realistic conditions. We generate perturbed operational data from existing lab cycling data, measure calibration degradation across four severity levels and four prediction horizons, and test whether lightweight recalibration can restore trustworthiness. The true SOH trajectory is preserved throughout, isolating the effect of observational distribution shift from changed degradation dynamics.
+
+\section{Background}
+
+The framework~\cite{shikdar2026learning} defines operational failure as the inability to complete a service commitment within horizon \(H\) cycles. A gradient-boosted tree ensemble (XGBoost) maps per-cycle features to failure probability:
+
+\[
+f_\theta: \mathbf{x}_t \longrightarrow P_{\text{fail}}(t, H)
+\]
+
+where \(\mathbf{x}_t = \{\text{SOH}_t, V_{\text{avg}}, V_{\text{min}}, I_{\text{avg}}, T_{\text{avg}}, \text{duration}, t\}\). After training, isotonic regression calibrates raw probabilities. Model parameters are in Table~\ref{tab:params}.
+
+\begin{table}[htbp]
+\centering
+\caption{Model parameters.}
+\label{tab:params}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Parameter & Value \\
+\midrule
+Model type & XGBoost \\
+Estimators & 300, max depth 4, lr 0.05 \\
+Subsample / colsample & 0.8 / 0.8 \\
+Min child weight & 5 \\
+Calibration & Isotonic regression \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Calibration matters because dispatch decisions use risk thresholds. A well-calibrated model satisfies \(P(\text{failure} \mid \hat{P}=p) \approx p\); without this, systematic biases cause unsafe decisions regardless of AUC. ECE quantifies this mismatch across 10 uniform bins.
+
+\section{Methodology}
+
+\subsection{Experimental Design}
+
+We evaluate a fixed model (trained on clean data) on perturbed operational data. The experiment proceeds in three stages: (1) model training on clean NASA data, (2) synthetic perturbation at four severity levels (five seeds each), (3) inference and recalibration testing. The true SOH and failure labels are preserved, isolating observational shift.
+
+\subsection{Model Training}
+
+An XGBoost classifier with isotonic calibration is trained on 37 NASA 18650 cells (1,028 valid cycles). An 80/20 cell-level holdout fits the calibrator. The model remains frozen throughout. Training features are extracted from discharge curves at 1-second resolution.
+
+\subsection{Perturbation Generation}
+
+Raw discharge curves from NASA .mat files are truncated at a randomly sampled DoD fraction to simulate partial cycling. Features are recomputed from the truncated signal. Temperature noise is added as \(\mathcal{N}(0, \sigma_s)\) to raw measurements before averaging.
+
+\begin{table}[htbp]
+\centering
+\caption{Perturbation severity levels.}
+\label{tab:severity}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Level & DoD range & Temp noise $\sigma$ & Description \\
+\midrule
+1 & 75--100\% & 0.5$^\circ$C & Mild: slight under-utilization \\
+2 & 55--75\% & 1.0$^\circ$C & Moderate: typical daily operation \\
+3 & 35--55\% & 2.0$^\circ$C & Severe: aggressive partial cycling \\
+4 & 15--35\% & 3.0$^\circ$C & Aggressive: extreme shallow cycling \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Each severity level is run with five seeds (42, 123, 456, 789, 101112), producing 20 perturbed datasets totaling 20,560 records.
+
+\subsection{Evaluation}
+
+For each dataset, we measure: raw XGBoost probabilities, calibrated probabilities (fixed isotonic regression), and recalibrated probabilities (new isotonic regression on 10\% random sample). Metrics: ECE (10 bins), AUC, Brier score.
+
+\section{Results}
+
+\subsection{Clean Baseline}
+
+\begin{table}[htbp]
+\centering
+\caption{Clean baseline.}
+\label{tab:clean}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Horizon & ECE & AUC & Brier \\
+\midrule
+10 & 0.010 & 0.994 & 0.013 \\
+20 & 0.031 & 0.985 & 0.030 \\
+30 & 0.013 & 0.994 & 0.014 \\
+50 & 0.023 & 0.998 & 0.020 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Calibration Degrades Substantially}
+
+At \(H=20\), ECE jumps from 0.031 to 0.277--0.293---a nine-fold increase---while AUC drops from 0.985 to 0.65--0.74 (Table~\ref{tab:h20}). The degradation saturates at Severity~1: even minimal partial cycling causes near-maximal calibration loss.
+
+\begin{table}[htbp]
+\centering
+\caption{Results at \(H=20\). Mean $\pm$ std across 5 seeds.}
+\label{tab:h20}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Condition & ECE (raw) & ECE (cal) & ECE (recal) & AUC (cal) \\
+\midrule
+Clean & --- & 0.031 & --- & 0.985 \\
+S1 (mild) & 0.226$\pm$0.004 & 0.286$\pm$0.010 & 0.062$\pm$0.036 & 0.741$\pm$0.009 \\
+S2 (mod.) & 0.212$\pm$0.006 & 0.288$\pm$0.011 & 0.065$\pm$0.020 & 0.681$\pm$0.004 \\
+S3 (sev.) & 0.204$\pm$0.005 & 0.277$\pm$0.010 & 0.054$\pm$0.025 & 0.674$\pm$0.006 \\
+S4 (aggr.) & 0.220$\pm$0.004 & 0.293$\pm$0.014 & 0.061$\pm$0.022 & 0.652$\pm$0.005 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Full Horizon Results}
+
+The pattern holds across all horizons (Tables~\ref{tab:h10}--\ref{tab:h50}). Longer horizons show somewhat higher ECE under perturbation (0.33--0.38 at \(H=50\) vs. 0.27--0.31 at \(H=10\)), but the saturation effect is consistent everywhere.
+
+\begin{table}[htbp]
+\centering
+\caption{Results at \(H=10\).}
+\label{tab:h10}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Condition & ECE (raw) & ECE (cal) & ECE (recal) & AUC (cal) \\
+\midrule
+Clean & --- & 0.010 & --- & 0.994 \\
+S1 & 0.242$\pm$0.012 & 0.272$\pm$0.009 & 0.051$\pm$0.025 & 0.694$\pm$0.025 \\
+S2 & 0.274$\pm$0.009 & 0.302$\pm$0.005 & 0.059$\pm$0.012 & 0.657$\pm$0.012 \\
+S3 & 0.270$\pm$0.010 & 0.301$\pm$0.006 & 0.064$\pm$0.020 & 0.674$\pm$0.007 \\
+S4 & 0.283$\pm$0.008 & 0.313$\pm$0.004 & 0.069$\pm$0.022 & 0.626$\pm$0.017 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Results at \(H=30\).}
+\label{tab:h30}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Condition & ECE (raw) & ECE (cal) & ECE (recal) & AUC (cal) \\
+\midrule
+Clean & --- & 0.013 & --- & 0.994 \\
+S1 & 0.233$\pm$0.004 & 0.288$\pm$0.009 & 0.083$\pm$0.021 & 0.752$\pm$0.003 \\
+S2 & 0.235$\pm$0.010 & 0.298$\pm$0.011 & 0.070$\pm$0.017 & 0.706$\pm$0.004 \\
+S3 & 0.227$\pm$0.011 & 0.294$\pm$0.011 & 0.068$\pm$0.023 & 0.688$\pm$0.001 \\
+S4 & 0.265$\pm$0.010 & 0.317$\pm$0.005 & 0.070$\pm$0.027 & 0.678$\pm$0.008 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Results at \(H=50\).}
+\label{tab:h50}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Condition & ECE (raw) & ECE (cal) & ECE (recal) & AUC (cal) \\
+\midrule
+Clean & --- & 0.023 & --- & 0.998 \\
+S1 & 0.320$\pm$0.016 & 0.331$\pm$0.011 & 0.085$\pm$0.025 & 0.757$\pm$0.005 \\
+S2 & 0.343$\pm$0.018 & 0.366$\pm$0.013 & 0.076$\pm$0.022 & 0.742$\pm$0.002 \\
+S3 & 0.343$\pm$0.018 & 0.370$\pm$0.013 & 0.072$\pm$0.024 & 0.722$\pm$0.003 \\
+S4 & 0.359$\pm$0.017 & 0.381$\pm$0.012 & 0.079$\pm$0.034 & 0.731$\pm$0.005 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Recalibration Recovery}
+
+Recalibrating isotonic regression on a 10\% sample of perturbed data recovers calibration across all conditions (Table~\ref{tab:recal_summary}). ECE drops to 0.05--0.09---a 75--81\% reduction. The recovery is consistent regardless of severity or horizon.
+
+\begin{table}[htbp]
+\centering
+\caption{Recalibration recovery across all horizons.}
+\label{tab:recal_summary}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Horizon & Clean ECE & Perturbed range & Recalibrated range \\
+\midrule
+10 & 0.010 & 0.272--0.313 & 0.051--0.069 \\
+20 & 0.031 & 0.277--0.293 & 0.054--0.065 \\
+30 & 0.013 & 0.288--0.317 & 0.068--0.083 \\
+50 & 0.023 & 0.331--0.381 & 0.072--0.085 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Root Cause: Feature Shift}
+
+The primary driver of calibration degradation is the shift in minimum voltage. In full discharge, \(V_{\text{min}}\) reaches approximately 2.3~V. At 75\% DoD truncation (Severity~1), it rises to approximately 3.2~V---a 39\% increase. The XGBoost model learned split thresholds on clean feature ranges, and the isotonic calibrator cannot adapt to the shifted raw probability distribution.
+
+\section{Discussion}
+
+\subsection{Operational Boundary Map}
+
+Our results define three operating zones:
+\begin{itemize}
+\item \textbf{Safe (ECE $<$ 0.05):} Clean laboratory conditions only.
+\item \textbf{Warning (ECE 0.05--0.10):} Recalibrated operation. Achievable with a 10\% operational sample.
+\item \textbf{Unsafe (ECE $>$ 0.10):} Direct deployment under any partial cycling. ECE exceeds 0.27 regardless of severity.
+\end{itemize}
+
+\subsection{Why Calibration Is Fragile}
+
+The isotonic regression layer, essential for clean-data performance, becomes the weakest link under distribution shift. The saturation effect means even minimal partial cycling causes near-maximal degradation. AUC degrades less severely (0.985 to 0.65--0.74), meaning the model retains rank-ordering ability---it is the probability magnitude that becomes unreliable.
+
+\subsection{Practical Recalibration Strategy}
+
+A field operator deploying the published model would:
+\begin{enumerate}
+\item Collect 50--100 operational cycles from normal BESS operation.
+\item Extract the same seven per-cycle features.
+\item Run the frozen XGBoost model to get raw probabilities.
+\item Fit a new isotonic regression on raw probabilities vs.\ observed outcomes.
+\item Deploy the recalibrated model.
+\item Periodically update the calibrator.
+\end{enumerate}
+This requires no base classifier retraining, no original training data, and no additional feature engineering.
+
+\subsection{Limitations}
+
+Five limitations should be noted. First, we preserve the true SOH trajectory, isolating observational shift but not capturing coupled degradation dynamics. Second, results are for LCO chemistry only; validation across LFP, NMC, and other chemistries is needed. Third, we test only 10\% recalibration; optimal sample size needs characterization. Fourth, the Gaussian temperature noise model does not capture systematic thermal gradients or diurnal variation. Fifth, only XGBoost is tested; other architectures may differ.
+
+\section{Conclusion}
+
+This paper presents the first systematic robustness evaluation of multihorizon battery failure intelligence under realistic operating conditions. Three principal findings emerge:
+
+\begin{enumerate}
+\item Calibration degrades substantially under any level of partial cycling. ECE increases from 0.01--0.03 to 0.27--0.38, saturating at the mildest perturbation.
+\item Discrimination degrades moderately (AUC 0.99--1.00 to 0.63--0.76). The feature extractor generalizes better than the calibrator.
+\item Recalibration on a 10\% operational sample recovers 75--81\% of the calibration gap (ECE 0.05--0.09), providing a practical path to field deployment.
+\end{enumerate}
+
+Multihorizon hazard models are not inherently robust to observational distribution shift, but a lightweight recalibration strategy suffices to maintain reliability in the field.
+
+\begin{thebibliography}{2}
+\bibitem{shikdar2026learning}
+T.~A.~Shikdar and H.~Laaksonen, ``Learning when not to use a battery: Multihorizon failure intelligence,'' \textit{International Transactions on Electrical Energy Systems}, vol.~2026, p.~6000810, 2026.
+\bibitem{nasa2010battery}
+B.~Saha and K.~Goebel, ``Battery data set,'' NASA Ames Prognostics Data Repository, 2007.
+\end{thebibliography}
+
+\end{document}
