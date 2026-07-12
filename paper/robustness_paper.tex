@@ -24,7 +24,7 @@ School of Technology and Innovations, University of Vaasa, Finland\\
 \maketitle
 
 \begin{abstract}
-Multihorizon hazard learning produces calibrated failure probabilities that enable risk-aware battery dispatch, but existing validation uses only clean laboratory cycling data. We test whether calibration survives under realistic operating conditions. Using the published XGBoost hazard model trained on NASA 18650 data, we generate synthetic perturbed profiles at four severity levels by truncating raw discharge curves to simulate partial cycling (DoD 15--100\%), adding temperature noise ($\sigma=0.5$--$3.0^\circ$C), and randomizing rest effects. The fixed model's calibration degrades substantially across all four horizons (10, 20, 30, 50 cycles): ECE rises from 0.01--0.03 to 0.27--0.38, while AUC drops from 0.99--1.00 to 0.63--0.76. Degradation saturates at the mildest perturbation---even minimal partial cycling causes near-maximal calibration loss. Recalibrating the isotonic regression on a 10\% operational sample reduces ECE to 0.05--0.09, recovering 75--81\% of the gap. Calibration is not inherently robust to observational shifts, but a minimal recalibration step suffices for field deployment.
+Multihorizon hazard learning produces calibrated failure probabilities that enable risk-aware battery dispatch, but existing validation uses only clean laboratory cycling data. We test whether calibration survives under realistic operating conditions. Using the published XGBoost hazard model trained on NASA 18650 data, we generate synthetic perturbed profiles at four severity levels by truncating raw discharge curves to simulate partial cycling (DoD 15--100\%), adding temperature noise ($\sigma=0.5$--$3.0^\circ$C), and randomizing rest effects. The fixed model's calibration degrades substantially across all four horizons (10, 20, 30, 50 cycles): ECE rises from 0.01--0.03 to 0.27--0.38, while AUC drops from 0.99--1.00 to 0.61--0.77. Degradation saturates at the mildest perturbation---even minimal partial cycling causes near-maximal calibration loss. Recalibrating the isotonic regression on a 10\% operational sample reduces ECE to 0.05--0.09, recovering 74--91\% of the calibration gap. Calibration is not inherently robust to observational shifts, but a minimal recalibration step suffices for field deployment.
 \end{abstract}
 
 \section{Introduction}
@@ -76,7 +76,7 @@ An XGBoost classifier with isotonic calibration is trained on 37 NASA 18650 cell
 
 \subsection{Perturbation Generation}
 
-Raw discharge curves from NASA .mat files are truncated at a randomly sampled DoD fraction to simulate partial cycling. Features are recomputed from the truncated signal. Temperature noise is added as \(\mathcal{N}(0, \sigma_s)\) to raw measurements before averaging.
+Raw discharge curves from NASA .mat files are truncated at a randomly sampled DoD fraction to simulate partial cycling. Features are recomputed from the truncated signal. Temperature noise is added as \(\mathcal{N}(0, \sigma_s)\) to raw measurements before averaging. Rest irregularity is simulated by adding Gaussian noise \(\mathcal{N}(0, \rho_s)\) to the duration and average temperature features, with \(\rho_s = \{0.01, 0.02, 0.03, 0.05\}\) for severity levels 1--4.
 
 \begin{table}[htbp]
 \centering
@@ -198,7 +198,7 @@ S4 & 0.359$\pm$0.017 & 0.381$\pm$0.012 & 0.079$\pm$0.034 & 0.731$\pm$0.005 \\
 
 \subsection{Recalibration Recovery}
 
-Recalibrating isotonic regression on a 10\% sample of perturbed data recovers calibration across all conditions (Table~\ref{tab:recal_summary}). ECE drops to 0.05--0.09---a 75--81\% reduction. The recovery is consistent regardless of severity or horizon.
+Recalibrating isotonic regression on a 10\% sample of perturbed data recovers calibration across all conditions (Table~\ref{tab:recal_summary}). ECE drops to 0.05--0.09---a 74--91\% reduction. The recovery is consistent regardless of severity or horizon.
 
 \begin{table}[htbp]
 \centering
@@ -259,7 +259,7 @@ This paper presents the first systematic robustness evaluation of multihorizon b
 \begin{enumerate}
 \item Calibration degrades substantially under any level of partial cycling. ECE increases from 0.01--0.03 to 0.27--0.38, saturating at the mildest perturbation.
 \item Discrimination degrades moderately (AUC 0.99--1.00 to 0.63--0.76). The feature extractor generalizes better than the calibrator.
-\item Recalibration on a 10\% operational sample recovers 75--81\% of the calibration gap (ECE 0.05--0.09), providing a practical path to field deployment.
+ \item Recalibration on a 10\% operational sample recovers 74--91\% of the calibration gap (ECE 0.05--0.09), providing a practical path to field deployment.
 \end{enumerate}
 
 Multihorizon hazard models are not inherently robust to observational distribution shift, but a lightweight recalibration strategy suffices to maintain reliability in the field.
