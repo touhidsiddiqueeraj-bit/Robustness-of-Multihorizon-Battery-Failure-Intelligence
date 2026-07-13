@@ -64,6 +64,13 @@ Calibration & Isotonic regression \\
 
 Calibration matters because dispatch decisions use risk thresholds. A well-calibrated model satisfies \(P(\text{failure} \mid \hat{P}=p) \approx p\); without this, systematic biases cause unsafe decisions regardless of AUC. ECE quantifies this mismatch across 10 uniform bins.
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../figs/F_Reliability_Diagrams.png}
+\caption{Reliability diagrams showing calibration quality under clean baseline conditions. Perfect calibration follows the diagonal; deviations reveal systematic bias.}
+\label{fig:reliability}
+\end{figure}
+
 \section{Methodology}
 
 \subsection{Experimental Design}
@@ -141,6 +148,20 @@ S4 (aggr.) & 0.220$\pm$0.004 & 0.293$\pm$0.014 & 0.068$\pm$0.025 & 0.652$\pm$0.0
 \end{tabular}
 \end{table}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../figs/F_ECE_vs_Severity.png}
+\caption{Expected calibration error (ECE) across severity levels for all prediction horizons. ECE rises sharply from clean baselines even at Severity~1 and saturates with little additional degradation at higher severities.}
+\label{fig:ece}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../figs/F_AUC_vs_Severity.png}
+\caption{AUC across severity levels. Discrimination degrades more gracefully than calibration, confirming the model retains rank-ordering ability.}
+\label{fig:auc}
+\end{figure}
+
 \subsection{Full Horizon Results}
 
 The pattern holds across all horizons (Tables~\ref{tab:h10}--\ref{tab:h50}). Longer horizons show somewhat higher ECE under perturbation (0.33--0.38 at \(H=50\) vs. 0.27--0.31 at \(H=10\)), but the saturation effect is consistent everywhere.
@@ -215,6 +236,13 @@ Horizon & Clean ECE & Perturbed range & Recalibrated range \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../figs/F_Combined_Robustness.png}
+\caption{Combined robustness summary. The left panel shows raw ECE, calibrated ECE, and recalibrated ECE across all conditions; the right panel shows the corresponding AUC values. Recalibration consistently recovers calibration across all horizons and severity levels.}
+\label{fig:combined}
+\end{figure}
 
 \subsection{Root Cause: Feature Shift}
 
