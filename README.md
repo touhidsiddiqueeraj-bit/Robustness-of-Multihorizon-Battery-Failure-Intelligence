@@ -6,7 +6,7 @@ This project evaluates the robustness of a multihorizon battery failure predicti
 
 Key findings:
 - Calibration degrades ~9x (ECE from 0.03 to 0.28) under even mild perturbation
-- Recalibration on 10% of operational data recovers 74–91% of the gap
+- Recalibration on 10% of operational data recovers 71–88% of the gap (held-out)
 - Three operating zones: Safe (clean lab), Warning (recalibrated), Unsafe (direct deployment)
 
 ## Structure

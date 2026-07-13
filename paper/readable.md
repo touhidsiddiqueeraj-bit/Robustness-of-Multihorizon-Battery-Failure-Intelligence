@@ -1,5 +1,5 @@
 **Abstract.** 
-Multihorizon hazard learning has emerged as a promising framework for operational battery reliability estimation, producing calibrated failure probabilities that enable risk-aware dispatch decisions. However, existing validation is performed exclusively on clean laboratory cycling data, leaving the crucial question unanswered: does calibration survive when the model encounters realistic operating conditions? This paper presents the first systematic investigation of calibration robustness under operational distribution shift. Starting from the published XGBoost hazard model trained on NASA 18650 lithium-ion battery data, we generate synthetic perturbed profiles at four severity levels by truncating raw discharge curves to simulate partial cycling at varying depths of discharge, injecting temperature measurement noise, and randomizing rest-period effects. The fixed model's calibrated failure probabilities degrade substantially: Expected Calibration Error (ECE) rises from 0.01–0.03 on clean data to 0.27–0.38 across all severity levels, while AUC drops from 0.985–0.998 to 0.61–0.77. We further show that recalibration on a small sample (10%) of operational data reduces ECE to 0.05–0.09, largely recovering trustworthiness. Our results establish an operational boundary map for multihorizon hazard models, demonstrating that while calibration is not inherently robust to operational shifts, a minimal recalibration strategy suffices to maintain reliability in the field.
+Multihorizon hazard learning has emerged as a promising framework for operational battery reliability estimation, producing calibrated failure probabilities that enable risk-aware dispatch decisions. However, existing validation is performed exclusively on clean laboratory cycling data, leaving the crucial question unanswered: does calibration survive when the model encounters realistic operating conditions? This paper presents the first systematic investigation of calibration robustness under operational distribution shift. Starting from the published XGBoost hazard model trained on NASA 18650 lithium-ion battery data, we generate synthetic perturbed profiles at four severity levels by truncating raw discharge curves to simulate partial cycling at varying depths of discharge, injecting temperature measurement noise, and randomizing rest-period effects. The fixed model's calibrated failure probabilities degrade substantially: Expected Calibration Error (ECE) rises from 0.01–0.03 on clean data to 0.27–0.38 across all severity levels, while AUC drops from 0.985–0.998 to 0.61–0.77. We further show that recalibration on a small sample (10%) of operational data reduces ECE to 0.06–0.09 (held-out evaluation), largely recovering trustworthiness. Our results establish an operational boundary map for multihorizon hazard models, demonstrating that while calibration is not inherently robust to operational shifts, a minimal recalibration strategy suffices to maintain reliability in the field.
 
 ## Introduction**
 
@@ -109,7 +109,7 @@ This saturation occurs because the model relies heavily on the minimum voltage f
 
 ### Recalibration Recovery
 
-Recalibration on a 10% sample of operational data recovers most of the calibration quality. ECE drops from \(\sim\)0.28 to 0.05–0.09 across all severity levels. While ECE does not return to the clean baseline, the recalibrated model produces substantially more trustworthy probability estimates.
+Recalibration on a 10% sample of operational data recovers most of the calibration quality. ECE drops from \(\sim\)0.28 to 0.06–0.09 (held-out evaluation) across all severity levels. While ECE does not return to the clean baseline, the recalibrated model produces substantially more trustworthy probability estimates.
 
 The recalibration strategy is practical: isotonic regression requires no labeled training of the base classifier and can be implemented with a small number of operational cycles. This finding suggests that field deployment is feasible if accompanied by a lightweight recalibration step during commissioning.
 
@@ -123,7 +123,7 @@ Our results provide the first quantitative characterization of multihorizon haza
 
 -  **Discrimination degrades moderately. AUC drops from 0.985 to 0.74 at mild perturbation and further to 0.65 at aggressive perturbation, indicating that the model's rank-ordering ability is more robust than its probability estimation.
 
--  **Recalibration is effective. A 10% operational sample recovers ECE to 0.05–0.09, suggesting a practical deployment pathway: deploy with fixed model + recalibrate on initial operational data.
+-  **Recalibration is effective. A 10% operational sample recovers ECE to 0.06–0.09 (held-out), suggesting a practical deployment pathway: deploy with fixed model + recalibrate on initial operational data.
 
 ### Implications for Deployment
 
@@ -137,6 +137,6 @@ Several limitations should be acknowledged. First, our perturbation methodology 
 
 ## Conclusion
 
-This paper presents the first systematic robustness evaluation of multihorizon battery failure intelligence under realistic operating conditions. Using synthetic perturbation of laboratory cycling data at four severity levels, we demonstrate that calibration degrades substantially under partial cycling, temperature noise, and rest irregularity: ECE increases from 0.01–0.03 to 0.27–0.38, and AUC drops from 0.985–0.998 to 0.61–0.77. However, we also show that recalibration on a 10% sample of operational data recovers ECE to 0.05–0.09, providing a practical path to field deployment.
+This paper presents the first systematic robustness evaluation of multihorizon battery failure intelligence under realistic operating conditions. Using synthetic perturbation of laboratory cycling data at four severity levels, we demonstrate that calibration degrades substantially under partial cycling, temperature noise, and rest irregularity: ECE increases from 0.01–0.03 to 0.27–0.38, and AUC drops from 0.985–0.998 to 0.61–0.77. However, we also show that recalibration on a 10% sample of operational data recovers ECE to 0.06–0.09 (held-out), providing a practical path to field deployment.
 
 Our findings establish that multihorizon hazard models, while not inherently robust to operational distribution shift, can be deployed with a lightweight recalibration strategy. The operational boundary map we provide enables grid operators to understand when the model can be trusted and what corrective measures are needed.
