@@ -10,7 +10,6 @@ from sklearn.isotonic import IsotonicRegression
 import joblib
 
 SRC = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(SRC, "..", "battery_sens", "battery_sens", "src"))
 from composite_label import make_composite_fail_in_H
 
 BASE = os.path.normpath(os.path.join(SRC, ".."))

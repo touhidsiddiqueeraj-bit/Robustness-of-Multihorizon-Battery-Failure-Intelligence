@@ -5,9 +5,9 @@ import scipy.io as sio
 
 SRC = os.path.dirname(os.path.abspath(__file__))
 BASE = os.path.normpath(os.path.join(SRC, ".."))
-DATA_PATH = os.path.join(BASE, "battery_sens", "battery_sens", "data", "nasa")
+DATA_PATH = os.path.join(BASE, "data", "nasa")
 OUT_DIR = os.path.join(BASE, "data", "synthetic")
-CLEAN_CSV = os.path.join(BASE, "battery_sens", "battery_sens", "data", "nasa_clean_filtered.csv")
+CLEAN_CSV = os.path.join(BASE, "data", "nasa_clean_filtered.csv")
 
 SEVERITY_CONFIG = {
     1: {"dod_range": (0.75, 1.00), "temp_noise_std": 0.5, "rest_noise_std": 0.01},
@@ -83,6 +83,10 @@ def _perturb_raw_cycle(voltage, current, temperature, time, capacity,
     duration = float(tm[-1] - tm[0]) if len(tm) > 1 else np.nan
     t_noisy = t + rng.normal(0, temp_noise_std, size=len(t))
     avg_t = float(np.nanmean(t_noisy))
+    # rest randomization: proportional noise
+    if np.isfinite(duration):
+        duration *= max(0, 1.0 + rng.normal(0, rest_noise_std))
+    avg_t *= 1.0 + rng.normal(0, rest_noise_std)
     return {"avg_voltage": avg_v, "min_voltage": min_v,
             "avg_current": avg_i, "avg_temp": avg_t, "duration": duration}
 
@@ -91,6 +95,14 @@ def _build_raw_index():
     """Build {(cell, cycle): {voltage, current, ...}} from all .mat files.
     Cycle numbering matches loader.py (counts all cycles, extracts only discharge).
     """
+    if not os.path.isdir(DATA_PATH):
+        raise FileNotFoundError(
+            f"Raw NASA .mat files not found at {DATA_PATH}. "
+            "Download the NASA Battery dataset from "
+            "https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/"
+            "pcoe/pcoe-prognostic-data-repository/"
+            "and place the .mat files in data/nasa/"
+        )
     index = {}
     for root, _, files in os.walk(DATA_PATH):
         for f in files:

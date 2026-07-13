@@ -76,7 +76,7 @@ An XGBoost classifier with isotonic calibration is trained on 37 NASA 18650 cell
 
 \subsection{Perturbation Generation}
 
-Raw discharge curves from NASA .mat files are truncated at a randomly sampled DoD fraction to simulate partial cycling. Features are recomputed from the truncated signal. Temperature noise is added as \(\mathcal{N}(0, \sigma_s)\) to raw measurements before averaging. Rest irregularity is simulated by adding Gaussian noise \(\mathcal{N}(0, \rho_s)\) to the duration and average temperature features, with \(\rho_s = \{0.01, 0.02, 0.03, 0.05\}\) for severity levels 1--4.
+Raw discharge curves from NASA .mat files are truncated at a randomly sampled DoD fraction to simulate partial cycling. Features are recomputed from the truncated signal. Temperature noise is added as \(\mathcal{N}(0, \sigma_s)\) to raw measurements before averaging. Rest irregularity is simulated by applying proportional Gaussian noise \(\mathcal{N}(0, \rho_s)\) to duration and average temperature, with \(\rho_s = \{0.01, 0.02, 0.03, 0.05\}\) for severity levels 1--4.
 
 \begin{table}[htbp]
 \centering

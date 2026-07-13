@@ -6,7 +6,7 @@ This project evaluates the robustness of a multihorizon battery failure predicti
 
 Key findings:
 - Calibration degrades ~9x (ECE from 0.03 to 0.28) under even mild perturbation
-- Recalibration on 10% of operational data recovers 75–81% of the gap
+- Recalibration on 10% of operational data recovers 74–91% of the gap
 - Three operating zones: Safe (clean lab), Warning (recalibrated), Unsafe (direct deployment)
 
 ## Structure
@@ -15,15 +15,17 @@ Key findings:
 |------|---------|
 | `src/` | Robustness study source: synthetic data gen, training, evaluation, plotting, tables |
 | `paper/` | LaTeX paper source and PDF |
-| `data/` | Clean NASA reference dataset |
+| `data/` | Clean NASA reference dataset and raw .mat files |
 | `results/` | Robustness evaluation metrics |
 | `figs/` | Generated figures |
 | `tables/` | Paper tables (CSV, PNG) |
-| `battery_sens/` | Original multihorizon hazard learning framework (journal paper) |
 
 ## Usage
 
 ```bash
+# 0. Prerequisite: download NASA Battery dataset .mat files into data/nasa/
+#    https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-prognostic-data-repository/
+
 # 1. Generate perturbed datasets from raw NASA .mat files
 python src/synthetic_data.py
 

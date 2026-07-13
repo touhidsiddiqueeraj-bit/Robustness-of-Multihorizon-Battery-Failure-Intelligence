@@ -6,8 +6,9 @@ import joblib
 from sklearn.metrics import brier_score_loss, roc_auc_score
 from sklearn.isotonic import IsotonicRegression
 
+from compute_ece import compute_ece
+
 SRC = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(SRC, "..", "battery_sens", "battery_sens", "src"))
 from composite_label import make_composite_fail_in_H
 
 BASE = os.path.normpath(os.path.join(SRC, ".."))
@@ -24,17 +25,6 @@ CAL_SAMPLE_FRAC = 0.10
 
 def safe_auc(y_true, p):
     return roc_auc_score(y_true, p) if len(np.unique(y_true)) > 1 else np.nan
-
-
-def compute_ece(y_true, prob, bins=10):
-    edges = np.linspace(0, 1, bins + 1)
-    ece = 0.0
-    for i in range(bins):
-        mask = (prob >= edges[i]) & (prob < edges[i + 1])
-        if mask.sum() == 0:
-            continue
-        ece += abs(prob[mask].mean() - y_true[mask].mean()) * mask.sum() / len(y_true)
-    return ece
 
 
 def main():
@@ -110,7 +100,7 @@ def main():
                 else:
                     p_recal = p_cal.copy()
 
-                row["ece_recal"] = compute_ece(y, p_recal)
+                row["ece_recal"] = compute_ece(y[~mask], p_recal[~mask])
 
                 results.append(row)
                 print(f"s={severity} seed={seed} H={H}: "

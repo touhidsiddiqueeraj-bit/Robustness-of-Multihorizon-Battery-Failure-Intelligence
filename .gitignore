@@ -1,9 +1,11 @@
-# Raw data
-battery_sens/battery_sens/data/
-battery_sens/calce/
+# Raw data — raw .mat files must be downloaded separately
+data/nasa/*.mat
+data/synthetic/*.csv
+
+# Deleted from repo; left on disk for reference
+battery_sens/
 Revision/
 **/Revision/
-data/synthetic/*.csv
 
 # Trained models
 models/*.joblib

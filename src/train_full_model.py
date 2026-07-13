@@ -8,12 +8,13 @@ from sklearn.metrics import brier_score_loss, roc_auc_score
 from xgboost import XGBClassifier
 from sklearn.isotonic import IsotonicRegression
 
+from compute_ece import compute_ece
+
 SRC = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(SRC, "..", "battery_sens", "battery_sens", "src"))
 from composite_label import make_composite_fail_in_H
 
 BASE = os.path.normpath(os.path.join(SRC, ".."))
-DATA_DIR = os.path.join(BASE, "battery_sens", "battery_sens", "data")
+DATA_DIR = os.path.join(BASE, "data")
 MODELS_DIR = os.path.join(BASE, "models")
 os.makedirs(MODELS_DIR, exist_ok=True)
 
@@ -80,13 +81,28 @@ def main():
 
         b_val = brier_score_loss(y_val, p_cal_val)
         a_val = safe_auc(y_val, p_cal_val)
-        print(f"  H={H}: Brier={b_val:.4f} AUC={a_val:.4f} (cal on val)")
+        e_val = compute_ece(y_val, p_cal_val)
+        print(f"  H={H}: Brier={b_val:.4f} AUC={a_val:.4f} ECE={e_val:.4f} (cal on val)")
 
         models[H] = clf
         calibrators[H] = iso
 
     joblib.dump({"models": models, "calibrators": calibrators}, os.path.join(MODELS_DIR, "full_model.joblib"))
     print(f"Saved: {os.path.join(MODELS_DIR, 'full_model.joblib')}")
+
+    # save clean baseline metrics for table generation
+    rows = []
+    for H in H_LIST:
+        y = make_composite_fail_in_H(df, H)
+        iso = calibrators[H]
+        clf = models[H]
+        p_raw = clf.predict_proba(X)[:, 1]
+        p_cal = iso.transform(p_raw)
+        rows.append({"H": H, "ece_cal": compute_ece(y, p_cal), "auc_cal": safe_auc(y, p_cal),
+                     "brier_cal": brier_score_loss(y, p_cal)})
+    baseline_path = os.path.join(MODELS_DIR, "..", "results", "clean_baseline.csv")
+    pd.DataFrame(rows).to_csv(baseline_path, index=False)
+    print(f"Saved clean baseline: {baseline_path}")
 
 
 if __name__ == "__main__":

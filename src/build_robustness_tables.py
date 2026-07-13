@@ -16,13 +16,25 @@ os.makedirs(TABLES, exist_ok=True)
 df = pd.read_csv(os.path.join(RESULTS, "robustness_results.csv"))
 h20 = df[df.H == 20]
 
+# Clean baseline — computed from the model on clean data, stored as a one-row CSV
+CLEAN_BASELINE = os.path.join(BASE, "results", "clean_baseline.csv")
+if os.path.exists(CLEAN_BASELINE):
+    cb = pd.read_csv(CLEAN_BASELINE)
+    cb_lookup = {row["H"]: row for _, row in cb.iterrows()}
+    def _clean_ece(H): return cb_lookup[H]["ece_cal"]
+    def _clean_auc(H): return cb_lookup[H]["auc_cal"]
+else:
+    # fallback hardcoded values if baseline not computed yet
+    _clean_ece = {10: 0.010, 20: 0.031, 30: 0.013, 50: 0.023}.get
+    _clean_auc = {10: 0.994, 20: 0.985, 30: 0.994, 50: 0.998}.get
+
 # Table 1: Primary results H=20
 t1 = pd.DataFrame({
     "Severity": ["Clean", "S1 (mild)", "S2 (moderate)", "S3 (severe)", "S4 (aggressive)"],
     "ECE (raw)": ["—"] + [f"{h20[h20.severity==s].ece_raw.mean():.3f}" for s in [1,2,3,4]],
-    "ECE (cal)": ["0.031"] + [f"{h20[h20.severity==s].ece_cal.mean():.3f}" for s in [1,2,3,4]],
+    "ECE (cal)": [f"{_clean_ece(20):.3f}"] + [f"{h20[h20.severity==s].ece_cal.mean():.3f}" for s in [1,2,3,4]],
     "ECE (recal)": ["—"] + [f"{h20[h20.severity==s].ece_recal.mean():.3f}" for s in [1,2,3,4]],
-    "AUC": ["0.985"] + [f"{h20[h20.severity==s].auc_cal.mean():.3f}" for s in [1,2,3,4]],
+    "AUC": [f"{_clean_auc(20):.3f}"] + [f"{h20[h20.severity==s].auc_cal.mean():.3f}" for s in [1,2,3,4]],
 })
 t1.to_csv(os.path.join(TABLES, "Table1_Robustness_H20.csv"), index=False)
 
@@ -39,11 +51,10 @@ t2 = pd.DataFrame(rows)
 t2.to_csv(os.path.join(TABLES, "Table2_Robustness_AllHorizons.csv"), index=False)
 
 # Table 3: Recalibration recovery
-clean_eces = {"10": "0.010", "20": "0.031", "30": "0.013", "50": "0.023"}
 rows3 = []
 for H in [10, 20, 30, 50]:
     sub = df[df.H == H]
-    rows3.append({"Horizon": f"H={H}", "Clean ECE": clean_eces[str(H)],
+    rows3.append({"Horizon": f"H={H}", "Clean ECE": f"{_clean_ece(H):.3f}",
         "Perturbed": f"{sub.ece_cal.min():.3f}--{sub.ece_cal.max():.3f}",
         "Recalibrated": f"{sub.ece_recal.min():.3f}--{sub.ece_recal.max():.3f}"})
 t3 = pd.DataFrame(rows3)

@@ -67,7 +67,7 @@ Raw discharge curves from the NASA dataset (voltage, current, temperature, and t
 
 **Temperature noise: Gaussian noise \(\mathcalN(0, \sigma_s)\) is added to raw temperature measurements before averaging, with \(\sigma_s = \0.5, 1.0, 2.0, 3.0\^\circ\)C for severity levels 1–4.
 
-**Rest randomization: Gaussian noise \(\mathcal{N}(0, \rho_s)\) is added to duration and average temperature features, with \(\rho_s = \{0.01, 0.02, 0.03, 0.05\}\) for severity levels 1–4.
+**Rest randomization: Proportional Gaussian noise \(\mathcal{N}(0, \rho_s)\) is applied to duration and average temperature, with \(\rho_s = \{0.01, 0.02, 0.03, 0.05\}\) for severity levels 1–4.
 
 The true battery health (SOH trajectory and failure labels) is preserved from the clean data, isolating the effect of observational distribution shift from degradation model uncertainty. The perturbation cascade is described in Table 1.
 
