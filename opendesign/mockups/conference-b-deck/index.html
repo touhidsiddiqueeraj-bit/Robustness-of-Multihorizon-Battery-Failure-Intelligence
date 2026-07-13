@@ -8,38 +8,39 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --title: 64px;
-    --subtitle: 38px;
-    --body: 30px;
-    --small: 22px;
+    --title: 72px;
+    --subtitle: 40px;
+    --body: 32px;
+    --small: 24px;
     --tiny: 18px;
 
-    --pad-top: 100px;
-    --pad-bottom: 80px;
     --pad-x: 100px;
-    --title-gap: 48px;
-    --item-gap: 24px;
 
-    --bg: #ffffff;
-    --bg-alt: #f4f4f6;
-    --bg-dark: #1a1d23;
-    --text: #1a1a1a;
-    --text-muted: #6b6b6b;
-    --text-light: #ffffff;
-    --accent: #1a56db;
-    --accent-light: #e8edf9;
-    --danger: #c62828;
-    --success: #2e7d32;
-    --border: #d0d0d0;
+    --navy: #0f172a;
+    --navy-light: #1e293b;
+    --navy-mid: #334155;
+    --gold: #f59e0b;
+    --gold-light: #fbbf24;
+    --cream: #f8fafc;
+    --white: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --danger: #dc2626;
+    --success: #16a34a;
+    --warn: #d97706;
+    --border: #e2e8f0;
+
+    --bar-h: 4px;
   }
 
   html, body {
     width: 100%;
     height: 100%;
-    background: #111;
+    background: #0f0f0f;
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     color: var(--text);
     overflow: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
   .stage {
@@ -57,10 +58,10 @@
     height: 1080px;
     display: flex;
     flex-direction: column;
-    padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
-    background: var(--bg);
+    padding: 80px var(--pad-x) 100px;
+    background: var(--cream);
     opacity: 0;
-    transition: opacity 0.4s;
+    transition: opacity 0.35s ease;
     pointer-events: none;
   }
 
@@ -69,208 +70,434 @@
     pointer-events: auto;
   }
 
-  /* ── Slide types ── */
+  section.active .anim {
+    animation: fadeUp 0.5s ease forwards;
+    opacity: 0;
+  }
 
+  section.active .anim-1 { animation-delay: 0.0s; }
+  section.active .anim-2 { animation-delay: 0.2s; }
+  section.active .anim-3 { animation-delay: 0.4s; }
+  section.active .anim-4 { animation-delay: 0.6s; }
+  section.active .anim-5 { animation-delay: 0.8s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes countUp {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  section.active .stat-card { animation: countUp 0.5s ease forwards; opacity: 0; }
+  section.active .stat-card:nth-child(1) { animation-delay: 0.1s; }
+  section.active .stat-card:nth-child(2) { animation-delay: 0.3s; }
+  section.active .stat-card:nth-child(3) { animation-delay: 0.5s; }
+  section.active .stat-card:nth-child(4) { animation-delay: 0.7s; }
+
+  /* ── Progress bar ── */
+  .progress {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: var(--bar-h);
+    background: var(--gold);
+    transition: width 0.4s ease;
+    z-index: 10;
+  }
+
+  /* ── Title slide ── */
   .slide-title {
-    background: var(--bg-dark);
-    color: var(--text-light);
+    background: linear-gradient(135deg, var(--navy) 0%, #1a2744 100%);
+    color: var(--white);
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding-bottom: 180px;
+    padding-bottom: 140px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide-title::before {
+    content: '';
+    position: absolute;
+    top: -300px; right: -300px;
+    width: 800px; height: 800px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%);
+  }
+
+  .slide-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: var(--bar-h);
+    background: var(--gold);
   }
 
   .slide-title h1 {
-    font-size: 76px;
+    font-size: 88px;
     font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.15;
-    max-width: 1400px;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    position: relative;
+    z-index: 1;
   }
 
   .slide-title .meta {
-    margin-top: 40px;
+    margin-top: 32px;
     font-size: var(--subtitle);
-    color: rgba(255,255,255,0.6);
+    color: rgba(255,255,255,0.55);
     font-weight: 400;
+    line-height: 1.3;
+    position: relative;
+    z-index: 1;
   }
 
   .slide-title .authors {
-    margin-top: 24px;
+    margin-top: 48px;
     font-size: var(--small);
-    color: rgba(255,255,255,0.45);
+    color: rgba(255,255,255,0.4);
+    position: relative;
+    z-index: 1;
   }
 
+  .slide-title .venue {
+    margin-top: 8px;
+    font-size: var(--tiny);
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Section divider ── */
   .slide-section {
-    background: var(--bg-dark);
-    color: var(--text-light);
+    background: linear-gradient(135deg, var(--navy) 0%, #1a2744 100%);
+    color: var(--white);
     justify-content: center;
     align-items: center;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide-section::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: var(--bar-h);
+    background: var(--gold);
   }
 
   .slide-section .num {
-    font-size: var(--tiny);
+    font-size: 14px;
     font-weight: 600;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 16px;
+    color: var(--gold);
+    margin-bottom: 20px;
   }
 
   .slide-section h2 {
-    font-size: var(--title);
+    font-size: 68px;
     font-weight: 600;
-    max-width: 1200px;
     line-height: 1.2;
+    max-width: 1100px;
   }
 
   .slide-section .sub {
-    margin-top: 20px;
+    margin-top: 24px;
     font-size: var(--subtitle);
     color: rgba(255,255,255,0.5);
     font-weight: 400;
+    line-height: 1.4;
+    max-width: 900px;
   }
 
+  /* ── Content slides ── */
   .slide-content {
-    background: var(--bg);
+    background: var(--cream);
+    position: relative;
+  }
+
+  .slide-content::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: var(--bar-h);
+    background: var(--gold);
+  }
+
+  .slide-content .label-bar {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
   }
 
   .slide-content h2 {
-    font-size: var(--subtitle);
-    font-weight: 600;
-    color: var(--accent);
-    margin-bottom: 12px;
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 20px;
+    letter-spacing: -0.01em;
   }
 
-  .slide-content .chunk {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: var(--item-gap);
+  .slide-content h2 .highlight {
+    color: var(--gold);
   }
 
-  .slide-content p, .slide-content li {
+  .slide-content p {
     font-size: var(--body);
     line-height: 1.45;
     color: var(--text);
+  }
+
+  .slide-content p.lead {
+    font-size: var(--subtitle);
+    line-height: 1.4;
+    color: var(--navy);
+    font-weight: 500;
+  }
+
+  .slide-content .body-sm {
+    font-size: var(--small);
+    line-height: 1.45;
+    color: var(--text-muted);
   }
 
   .slide-content ul {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
   }
 
   .slide-content ul li {
-    padding-left: 36px;
+    font-size: var(--body);
+    line-height: 1.4;
+    padding-left: 40px;
     position: relative;
+    color: var(--text);
   }
 
   .slide-content ul li::before {
     content: "";
     position: absolute;
     left: 0;
-    top: 13px;
-    width: 12px;
-    height: 12px;
+    top: 14px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    background: var(--accent);
-    opacity: 0.3;
+    background: var(--gold);
+    opacity: 0.4;
   }
 
   .slide-content ul li strong {
-    color: var(--accent);
+    color: var(--navy);
   }
 
-  .slide-content .stat-row {
+  /* ── Stat cards ── */
+  .stat-row {
     display: flex;
-    gap: 40px;
-    justify-content: center;
-    margin-top: 16px;
+    gap: 32px;
+    flex-wrap: wrap;
   }
 
-  .slide-content .stat {
-    text-align: center;
-    padding: 28px 40px;
-    background: var(--accent-light);
-    border-radius: 8px;
+  .stat-card {
+    flex: 1;
     min-width: 200px;
+    text-align: center;
+    padding: 32px 24px;
+    border-radius: 12px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
 
-  .slide-content .stat .num {
-    font-size: var(--title);
-    font-weight: 700;
-    color: var(--accent);
+  .stat-card .num {
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
     line-height: 1;
   }
 
-  .slide-content .stat .label {
+  .stat-card .label {
     font-size: var(--small);
     color: var(--text-muted);
     margin-top: 8px;
+    font-weight: 500;
   }
 
-  .slide-content .stat.bad .num { color: var(--danger); }
-  .slide-content .stat.good .num { color: var(--success); }
+  .stat-card .sub-label {
+    font-size: var(--tiny);
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
 
-  /* ── Two-column ── */
-  .two-col {
+  .stat-card.good { border-left: 4px solid var(--success); }
+  .stat-card.good .num { color: var(--success); }
+  .stat-card.bad { border-left: 4px solid var(--danger); }
+  .stat-card.bad .num { color: var(--danger); }
+  .stat-card.warn { border-left: 4px solid var(--warn); }
+  .stat-card.warn .num { color: var(--warn); }
+  .stat-card.neutral .num { color: var(--navy); }
+
+  /* ── Figure layouts ── */
+  .fig-full {
+    flex: 1;
     display: flex;
-    gap: 60px;
-    flex: 1;
     align-items: center;
+    justify-content: center;
+    margin-top: 12px;
   }
 
-  .two-col .col {
+  .fig-full img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  .layout-side {
+    display: flex;
+    gap: 48px;
     flex: 1;
+    min-height: 0;
   }
 
-  .two-col .col img {
+  .layout-side .side-text {
+    flex: 0 0 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .layout-side .side-fig {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .layout-side .side-fig img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  /* ── Table style ── */
+  .deck-table {
     width: 100%;
-    border-radius: 6px;
-    border: 1px solid var(--border);
+    border-collapse: collapse;
+    font-size: var(--small);
+    margin-top: 8px;
   }
 
-  /* ── Zone boxes ── */
+  .deck-table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-weight: 600;
+    color: var(--navy);
+    border-bottom: 2px solid var(--gold);
+    font-size: 14px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .deck-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .deck-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* ── Zone cards ── */
   .zones {
     display: flex;
-    gap: 24px;
-    margin-top: 16px;
+    gap: 28px;
+    margin-top: 20px;
   }
 
   .zone {
     flex: 1;
-    padding: 28px 24px;
-    border-radius: 8px;
+    padding: 36px 28px;
+    border-radius: 12px;
     text-align: center;
+    border: 1px solid var(--border);
   }
 
-  .zone h3 { font-size: var(--subtitle); font-weight: 600; }
-  .zone .e { font-size: var(--body); margin-top: 8px; }
-  .zone .desc { font-size: var(--small); margin-top: 4px; color: var(--text-muted); }
+  .zone h3 { font-size: 44px; font-weight: 700; }
+  .zone .e { font-size: var(--body); margin-top: 8px; font-weight: 600; }
+  .zone .desc { font-size: var(--small); margin-top: 6px; color: var(--text-muted); }
 
-  .zone.safe { background: #e8f5e9; }
+  .zone.safe { background: #f0fdf4; border-color: #bbf7d0; }
   .zone.safe h3 { color: var(--success); }
-  .zone.warn { background: #fff3e0; }
-  .zone.warn h3 { color: #e65100; }
-  .zone.unsafe { background: #ffebee; }
+  .zone.warn { background: #fffbeb; border-color: #fde68a; }
+  .zone.warn h3 { color: var(--warn); }
+  .zone.unsafe { background: #fef2f2; border-color: #fecaca; }
   .zone.unsafe h3 { color: var(--danger); }
+
+  /* ── Numbered steps ── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--small);
+    font-weight: 700;
+  }
+
+  .step p {
+    font-size: var(--body);
+    line-height: 1.4;
+    padding-top: 6px;
+  }
+
+  .step p strong { color: var(--navy); }
 
   /* ── Slide number ── */
   .slide-number {
     position: absolute;
-    bottom: 40px;
+    bottom: 24px;
     right: var(--pad-x);
-    font-size: var(--tiny);
+    font-size: 14px;
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
+    z-index: 5;
   }
 
-  .slide-section .slide-number,
-  .slide-title .slide-number {
+  .slide-title .slide-number,
+  .slide-section .slide-number {
     color: rgba(255,255,255,0.3);
   }
 
@@ -281,44 +508,49 @@
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 16px;
+    align-items: center;
+    gap: 12px;
     z-index: 100;
-    background: rgba(0,0,0,0.7);
-    padding: 10px 20px;
-    border-radius: 30px;
-    backdrop-filter: blur(6px);
+    background: rgba(15,23,42,0.85);
+    padding: 8px 16px;
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
   }
 
   .controls button {
     background: none;
     border: none;
-    color: #fff;
-    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    font-size: 18px;
     cursor: pointer;
-    padding: 4px 12px;
+    padding: 4px 10px;
     border-radius: 4px;
     font-family: inherit;
+    transition: color 0.15s;
   }
 
-  .controls button:hover { background: rgba(255,255,255,0.15); }
-  .controls .page { color: rgba(255,255,255,0.5); font-size: 14px; padding: 4px 8px; }
+  .controls button:hover { color: var(--gold); }
+  .controls .page { color: rgba(255,255,255,0.4); font-size: 13px; padding: 4px 8px; min-width: 60px; text-align: center; }
 
   .scale-control {
     position: fixed;
     top: 12px;
     right: 12px;
     z-index: 100;
-    background: rgba(0,0,0,0.7);
+    background: rgba(15,23,42,0.85);
     padding: 6px 12px;
     border-radius: 20px;
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(10px);
     display: flex;
     gap: 8px;
     align-items: center;
+    border: 1px solid rgba(255,255,255,0.1);
   }
 
-  .scale-control label { color: rgba(255,255,255,0.5); font-size: 12px; }
-  .scale-control select { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+  .scale-control label { color: rgba(255,255,255,0.5); font-size: 11px; }
+  .scale-control select { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 2px 6px; border-radius: 4px; font-size: 11px; outline: none; }
+  .scale-control select option { background: #1e293b; }
 </style>
 </head>
 <body>
@@ -327,6 +559,8 @@
   <button onclick="prevSlide()">&#9664;</button>
   <span class="page" id="pageNum">1 / 11</span>
   <button onclick="nextSlide()">&#9654;</button>
+  <span style="color:rgba(255,255,255,0.2);margin:0 4px;">|</span>
+  <button onclick="toggleBlind()" title="Toggle content reveal" style="font-size:14px;letter-spacing:0.05em;" id="blindBtn">BLIND</button>
 </div>
 
 <div class="scale-control">
@@ -343,196 +577,246 @@
 
 <!-- Slide 1: Title -->
 <section class="slide-title active">
-  <h1>How Far Does the<br>Model Hold?</h1>
-  <div class="meta">Robustness of Multihorizon Battery<br>Failure Intelligence Under Realistic Conditions</div>
-  <div class="authors">Shikdar &amp; Laaksonen &mdash; University of Vaasa</div>
+  <h1 class="anim anim-1">How Far Does the<br>Model Hold?</h1>
+  <div class="meta anim anim-2">Robustness of Multihorizon Battery<br>Failure Intelligence Under Realistic Conditions</div>
+  <div class="authors anim anim-3">Shikdar &amp; Laaksonen &mdash; University of Vaasa</div>
+  <div class="venue anim anim-4">IEEE International Conference on Energy &amp; Power Systems</div>
   <span class="slide-number">1 / 11</span>
+  <div class="progress" style="width:9.1%"></div>
 </section>
 
 <!-- Slide 2: The gap -->
 <section class="slide-content">
-  <h2>Laboratory validation is not field validation</h2>
-  <div class="chunk">
-    <p>The published multihorizon hazard model was trained and tested on <strong>clean laboratory data</strong>: full cycles, fixed C-rates, controlled temperatures.</p>
-    <p>Real battery operation is different:</p>
-    <ul>
-      <li><strong>Partial cycling</strong> &mdash; varying depths of discharge</li>
-      <li><strong>Temperature fluctuations</strong> &mdash; sensor noise, thermal gradients</li>
-      <li><strong>Irregular rest periods</strong> &mdash; variable idle between cycles</li>
-    </ul>
-    <p style="margin-top:8px; color:var(--danger); font-weight:600;">Does calibration survive when the model meets real conditions?</p>
+  <div class="label-bar anim anim-1">Motivation</div>
+  <h2 class="anim anim-2">Lab results don't travel</h2>
+  <div class="layout-side" style="flex:1;min-height:0;">
+    <div class="side-text">
+      <p class="body-sm anim anim-3">The published hazard model was trained on <strong>clean lab data</strong>: full cycles, fixed C-rates, controlled temperatures.</p>
+      <p class="body-sm anim anim-4">Real BESS operation is fundamentally different:</p>
+      <ul>
+        <li class="anim anim-5"><strong>Partial cycling</strong> &mdash; varying depths of discharge</li>
+        <li class="anim anim-5"><strong>Temperature noise</strong> &mdash; sensor drift, thermal gradients</li>
+        <li class="anim anim-5"><strong>Irregular rest</strong> &mdash; variable idle between cycles</li>
+      </ul>
+    </div>
+    <div class="side-fig anim anim-4">
+      <div style="text-align:center;padding:20px;">
+        <div style="font-size:120px;line-height:1;margin-bottom:16px;opacity:0.6;">&#9888;</div>
+        <p style="font-size:var(--body);color:var(--danger);font-weight:600;">Does calibration survive<br>when the model meets real data?</p>
+      </div>
+    </div>
   </div>
   <span class="slide-number">2 / 11</span>
+  <div class="progress" style="width:18.2%"></div>
 </section>
 
 <!-- Slide 3: Approach -->
 <section class="slide-section">
-  <div class="num">Our approach</div>
-  <h2>Systematic robustness test across four severity levels</h2>
-  <div class="sub">Perturb laboratory data &rarr; apply frozen model &rarr; measure calibration degradation &rarr; test recalibration</div>
+  <div class="num anim anim-1">Approach</div>
+  <h2 class="anim anim-2">Systematic robustness test<br>across four severity levels</h2>
+  <div class="sub anim anim-3">Perturb lab data &rarr; apply frozen model &rarr; measure calibration &rarr; test recalibration</div>
   <span class="slide-number">3 / 11</span>
+  <div class="progress" style="width:27.3%"></div>
 </section>
 
 <!-- Slide 4: Perturbation methodology -->
 <section class="slide-content">
-  <h2>Perturbation methodology</h2>
-  <div class="two-col" style="flex:1;align-items:stretch;">
-    <div class="col" style="display:flex;flex-direction:column;justify-content:center;gap:var(--item-gap);">
-      <p>Raw NASA discharge curves are truncated at random depths of discharge, Gaussian temperature noise is added, and proportional rest noise is applied to duration and temperature.</p>
-      <table style="font-size:var(--small);border-collapse:collapse;width:100%;">
-        <tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:6px 8px;">Level</th><th style="text-align:left;padding:6px 8px;">DoD range</th><th style="text-align:left;padding:6px 8px;">Temp noise</th></tr>
-        <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;">1 (mild)</td><td style="padding:6px 8px;">75&ndash;100%</td><td style="padding:6px 8px;">&plusmn;0.5&deg;C</td></tr>
-        <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;">2 (moderate)</td><td style="padding:6px 8px;">55&ndash;75%</td><td style="padding:6px 8px;">&plusmn;1.0&deg;C</td></tr>
-        <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;">3 (severe)</td><td style="padding:6px 8px;">35&ndash;55%</td><td style="padding:6px 8px;">&plusmn;2.0&deg;C</td></tr>
-        <tr><td style="padding:6px 8px;">4 (aggressive)</td><td style="padding:6px 8px;">15&ndash;35%</td><td style="padding:6px 8px;">&plusmn;3.0&deg;C</td></tr>
+  <div class="label-bar anim anim-1">Experimental design</div>
+  <h2 class="anim anim-2">Perturbation <span class="highlight">methodology</span></h2>
+  <div class="layout-side" style="flex:1;min-height:0;">
+    <div class="side-text">
+      <p class="body-sm anim anim-3">NASA discharge curves truncated at random DoD, with Gaussian temperature noise and proportional rest noise applied.</p>
+      <table class="deck-table anim anim-4">
+        <tr><th>Level</th><th>DoD range</th><th>Temp noise</th><th>Description</th></tr>
+        <tr><td>1</td><td>75&ndash;100%</td><td>&plusmn;0.5&deg;C</td><td style="color:var(--text-muted);">Mild</td></tr>
+        <tr><td>2</td><td>55&ndash;75%</td><td>&plusmn;1.0&deg;C</td><td style="color:var(--text-muted);">Moderate</td></tr>
+        <tr><td>3</td><td>35&ndash;55%</td><td>&plusmn;2.0&deg;C</td><td style="color:var(--text-muted);">Severe</td></tr>
+        <tr><td>4</td><td>15&ndash;35%</td><td>&plusmn;3.0&deg;C</td><td style="color:var(--text-muted);">Aggressive</td></tr>
       </table>
-      <p style="font-size:var(--small);color:var(--text-muted);">5 seeds per level &bull; 20 perturbed datasets &bull; 20,560 records</p>
+      <p class="body-sm anim anim-5" style="color:var(--text-muted);margin-top:4px;">5 seeds per level &bull; 20 perturbed datasets &bull; 20,560 records</p>
     </div>
-    <div class="col" style="display:flex;align-items:center;justify-content:center;">
-      <div style="background:#f0ece4;border-radius:8px;padding:20px;width:100%;text-align:center;">
-        <img src="fig_ece.png" alt="ECE vs Severity" style="width:100%;border-radius:4px;">
-        <div style="font-size:var(--tiny);color:var(--text-muted);margin-top:8px;">ECE rises sharply even at minimal perturbation</div>
-      </div>
+    <div class="side-fig anim anim-4">
+      <img src="fig_ece.png" alt="ECE vs Severity">
     </div>
   </div>
   <span class="slide-number">4 / 11</span>
+  <div class="progress" style="width:36.4%"></div>
 </section>
 
 <!-- Slide 5: Calibration degrades -->
 <section class="slide-content">
-  <h2>Calibration degrades ~9x</h2>
-  <div class="chunk">
+  <div class="label-bar anim anim-1">Key finding</div>
+  <h2 class="anim anim-2">Calibration degrades <span class="highlight">~9&times;</span></h2>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px;">
     <div class="stat-row">
-      <div class="stat good">
-        <div class="num">0.03</div>
-        <div class="label">Clean ECE</div>
+      <div class="stat-card good anim">
+        <div class="num">0.031</div>
+        <div class="label">Clean baseline ECE</div>
+        <div class="sub-label">H=20, lab conditions</div>
       </div>
-      <div class="stat bad">
+      <div class="stat-card bad anim">
         <div class="num">0.28</div>
         <div class="label">Perturbed ECE</div>
+        <div class="sub-label">Severity 1&ndash;4, H=20</div>
       </div>
-      <div class="stat bad">
+      <div class="stat-card warn anim">
         <div class="num">0.65&ndash;0.74</div>
         <div class="label">Perturbed AUC</div>
+        <div class="sub-label">Down from 0.985</div>
+      </div>
+      <div class="stat-card bad anim">
+        <div class="num">S1</div>
+        <div class="label">Saturation at mildest</div>
+        <div class="sub-label">Even 75&ndash;100% DoD = near-max loss</div>
       </div>
     </div>
     <ul>
-      <li>ECE jumps from 0.031 to 0.277&ndash;0.293 at H=20 &mdash; a <strong>nine-fold increase</strong></li>
-      <li>Degradation <strong>saturates at the mildest perturbation</strong>: even minimal partial cycling (75&ndash;100% DoD) causes near-maximal loss</li>
-      <li>AUC drops from 0.985 to 0.65&ndash;0.74: discrimination degrades less than calibration</li>
+      <li class="anim anim-4">ECE jumps <strong>0.031 &rarr; 0.277&ndash;0.293</strong> &mdash; a nine-fold increase at H=20</li>
+      <li class="anim anim-5">Degradation <strong>saturates at Severity 1</strong>: even minimal partial cycling causes near-max loss</li>
+      <li class="anim anim-5">AUC drops more gracefully (0.985 &rarr; 0.65&ndash;0.74): discrimination &ne; calibration</li>
     </ul>
   </div>
   <span class="slide-number">5 / 11</span>
+  <div class="progress" style="width:45.5%"></div>
 </section>
 
 <!-- Slide 6: Root cause -->
 <section class="slide-content">
-  <h2>Root cause: minimum voltage shift</h2>
-  <div class="two-col" style="flex:1;">
-    <div class="col" style="display:flex;flex-direction:column;justify-content:center;gap:var(--item-gap);">
-      <p>The primary driver is a shift in the <strong>minimum voltage</strong> feature:</p>
-      <div class="stat-row" style="gap:24px;">
-        <div class="stat">
-          <div class="num" style="font-size:44px;">2.3 V</div>
+  <div class="label-bar anim anim-1">Diagnosis</div>
+  <h2 class="anim anim-2">Root cause: <span class="highlight">V<sub>min</sub> shift</span></h2>
+  <div class="layout-side" style="flex:1;min-height:0;">
+    <div class="side-text">
+      <p class="body-sm anim anim-3">The primary driver is a shift in the <strong>minimum voltage</strong> feature under partial cycling.</p>
+      <div class="stat-row anim anim-4" style="gap:24px;">
+        <div class="stat-card neutral" style="flex:1;">
+          <div class="num">2.3 V</div>
           <div class="label">Full discharge</div>
         </div>
-        <div class="stat bad">
-          <div class="num" style="font-size:44px;">3.2 V</div>
+        <div class="stat-card bad" style="flex:1;">
+          <div class="num">3.2 V</div>
           <div class="label">75% DoD truncation</div>
         </div>
       </div>
-      <p style="font-size:var(--small);">A 39% increase. The XGBoost model learned split thresholds on clean feature ranges; the isotonic calibrator cannot adapt to the shifted probability distribution.</p>
+      <p class="body-sm anim anim-5" style="color:var(--text-muted);">A <strong>39% increase</strong> &mdash; the XGBoost model learned thresholds on clean ranges; the isotonic calibrator can't adapt to the shifted distribution.</p>
     </div>
-    <div class="col" style="display:flex;align-items:center;justify-content:center;">
-      <img src="fig_reliability.png" alt="Reliability diagrams" style="width:100%;border-radius:6px;border:1px solid var(--border);">
+    <div class="side-fig anim anim-4">
+      <img src="fig_reliability.png" alt="Reliability diagrams">
     </div>
   </div>
   <span class="slide-number">6 / 11</span>
+  <div class="progress" style="width:54.5%"></div>
 </section>
 
-<!-- Slide 7: Recalibration -->
+<!-- Slide 7: Recalibration result -->
 <section class="slide-section">
-  <div class="num">Key result</div>
-  <h2>Recalibration on 10% of operational data recovers most of the gap</h2>
-  <div class="sub">ECE drops from ~0.28 to 0.06&ndash;0.09 &bull; 71&ndash;88% recovery</div>
+  <div class="num anim anim-1">Key result</div>
+  <h2 class="anim anim-2">Recalibration on 10%<br>recovers <span style="color:var(--gold);">71&ndash;88%</span> of the gap</h2>
+  <div class="sub anim anim-3">ECE drops from ~0.28 to 0.06&ndash;0.09 &bull; evaluated on held-out data</div>
   <span class="slide-number">7 / 11</span>
+  <div class="progress" style="width:63.6%"></div>
 </section>
 
 <!-- Slide 8: Recalibration detail -->
 <section class="slide-content">
-  <h2>Recalibration: held-out evaluation</h2>
-  <div class="two-col" style="flex:1;">
-    <div class="col" style="display:flex;flex-direction:column;justify-content:center;gap:var(--item-gap);">
-      <p>Fitting a new isotonic regression on <strong>10% of perturbed data</strong> and evaluating on the held-out 90%:</p>
-      <table style="font-size:var(--small);border-collapse:collapse;width:100%;">
-        <tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:6px 8px;">Horizon</th><th style="text-align:left;padding:6px 8px;">Clean</th><th style="text-align:left;padding:6px 8px;">Perturbed</th><th style="text-align:left;padding:6px 8px;">Recalibrated</th></tr>
-        <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;">H=10</td><td style="padding:6px 8px;">0.010</td><td style="padding:6px 8px;">0.272&ndash;0.313</td><td style="padding:6px 8px;">0.057&ndash;0.076</td></tr>
-        <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;">H=20</td><td style="padding:6px 8px;">0.031</td><td style="padding:6px 8px;">0.277&ndash;0.293</td><td style="padding:6px 8px;">0.060&ndash;0.073</td></tr>
-        <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;">H=30</td><td style="padding:6px 8px;">0.013</td><td style="padding:6px 8px;">0.288&ndash;0.316</td><td style="padding:6px 8px;">0.076&ndash;0.092</td></tr>
-        <tr><td style="padding:6px 8px;">H=50</td><td style="padding:6px 8px;">0.023</td><td style="padding:6px 8px;">0.331&ndash;0.381</td><td style="padding:6px 8px;">0.080&ndash;0.094</td></tr>
+  <div class="label-bar anim anim-1">Evidence</div>
+  <h2 class="anim anim-2">Recalibration: <span class="highlight">held-out</span> evaluation</h2>
+  <div class="layout-side" style="flex:1;min-height:0;">
+    <div class="side-text">
+      <p class="body-sm anim anim-3">Isotonic regression fit on <strong>10% of perturbed data</strong>, evaluated on held-out 90%:</p>
+      <table class="deck-table anim anim-4">
+        <tr><th>Horizon</th><th>Clean ECE</th><th>Perturbed</th><th>Recalibrated</th></tr>
+        <tr><td>H=10</td><td>0.010</td><td>0.272&ndash;0.313</td><td><strong style="color:var(--success);">0.057&ndash;0.076</strong></td></tr>
+        <tr><td>H=20</td><td>0.031</td><td>0.277&ndash;0.293</td><td><strong style="color:var(--success);">0.060&ndash;0.073</strong></td></tr>
+        <tr><td>H=30</td><td>0.013</td><td>0.288&ndash;0.316</td><td><strong style="color:var(--success);">0.076&ndash;0.092</strong></td></tr>
+        <tr><td>H=50</td><td>0.023</td><td>0.331&ndash;0.381</td><td><strong style="color:var(--success);">0.080&ndash;0.094</strong></td></tr>
       </table>
-      <p style="font-size:var(--small);color:var(--text-muted);margin-top:4px;">Recovery consistent across all severity levels and horizons</p>
+      <p class="body-sm anim anim-5" style="color:var(--text-muted);">Consistent recovery across all severity levels and horizons</p>
     </div>
-    <div class="col" style="display:flex;align-items:center;justify-content:center;">
-      <img src="fig_combined.png" alt="Combined robustness figure" style="width:100%;border-radius:6px;border:1px solid var(--border);">
+    <div class="side-fig anim anim-4">
+      <img src="fig_combined.png" alt="Combined robustness">
     </div>
   </div>
   <span class="slide-number">8 / 11</span>
+  <div class="progress" style="width:72.7%"></div>
 </section>
 
 <!-- Slide 9: Three operating zones -->
 <section class="slide-content">
-  <h2>Three operating zones</h2>
-  <div class="chunk">
+  <div class="label-bar anim anim-1">Framework</div>
+  <h2 class="anim anim-2">Three operating <span class="highlight">zones</span></h2>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;">
     <div class="zones">
-      <div class="zone safe">
-        <h3>Safe</h3>
+      <div class="zone safe anim anim-3">
+        <h3>&#9679; Safe</h3>
         <div class="e">ECE &lt; 0.05</div>
         <div class="desc">Clean lab conditions only</div>
       </div>
-      <div class="zone warn">
-        <h3>Warning</h3>
+      <div class="zone warn anim anim-4">
+        <h3>&#9679; Warning</h3>
         <div class="e">ECE 0.05&ndash;0.10</div>
-        <div class="desc">Recalibrated operation</div>
+        <div class="desc">Recalibrated operation achievable<br>with 10% operational sample</div>
       </div>
-      <div class="zone unsafe">
-        <h3>Unsafe</h3>
+      <div class="zone unsafe anim anim-5">
+        <h3>&#9679; Unsafe</h3>
         <div class="e">ECE &gt; 0.10</div>
-        <div class="desc">Direct deployment under any partial cycling</div>
+        <div class="desc">Direct deployment under any<br>partial cycling (ECE &gt; 0.27)</div>
       </div>
     </div>
-    <p style="margin-top:12px;text-align:center;">Direct deployment under partial cycling pushes ECE &gt; 0.27 &mdash; firmly in the unsafe zone</p>
+    <p class="body-sm anim anim-5" style="text-align:center;color:var(--text-muted);">Direct deployment under partial cycling pushes ECE &gt; 0.27 &mdash; firmly in the unsafe zone</p>
   </div>
   <span class="slide-number">9 / 11</span>
+  <div class="progress" style="width:81.8%"></div>
 </section>
 
 <!-- Slide 10: Deployment path -->
 <section class="slide-content">
-  <h2>Practical deployment path</h2>
-  <div class="chunk">
-    <ol style="font-size:var(--body);display:flex;flex-direction:column;gap:12px;list-style:none;counter-reset:step;">
-      <li style="counter-increment:step;"><strong style="color:var(--accent);">1.</strong> Deploy the frozen XGBoost model as-is</li>
-      <li style="counter-increment:step;"><strong style="color:var(--accent);">2.</strong> Collect 50&ndash;100 operational cycles during normal BESS operation</li>
-      <li style="counter-increment:step;"><strong style="color:var(--accent);">3.</strong> Fit a new isotonic regression on these cycles</li>
-      <li style="counter-increment:step;"><strong style="color:var(--accent);">4.</strong> Deploy the recalibrated model &mdash; no base classifier retraining needed</li>
-    </ol>
-    <p style="margin-top:12px; text-align:center; color:var(--text-muted);">No original training data required &bull; No additional feature engineering</p>
+  <div class="label-bar anim anim-1">Action</div>
+  <h2 class="anim anim-2">Practical <span class="highlight">deployment</span> path</h2>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <div style="display:flex;gap:60px;align-items:center;">
+      <div style="flex:1;">
+        <div class="steps">
+          <div class="step anim anim-3">
+            <div class="step-num">1</div>
+            <p>Deploy the frozen <strong>XGBoost model</strong> as-is</p>
+          </div>
+          <div class="step anim anim-4">
+            <div class="step-num">2</div>
+            <p>Collect <strong>50&ndash;100 operational cycles</strong><br>from normal BESS operation</p>
+          </div>
+          <div class="step anim anim-4">
+            <div class="step-num">3</div>
+            <p>Fit a new <strong>isotonic regression</strong> on these cycles</p>
+          </div>
+          <div class="step anim anim-5">
+            <div class="step-num">4</div>
+            <p>Deploy the <strong>recalibrated model</strong><br><span style="font-size:var(--small);color:var(--text-muted);">No base classifier retraining &bull; No original training data needed</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="anim anim-5" style="flex:0 0 300px;text-align:center;padding:40px;background:var(--white);border-radius:12px;border:1px solid var(--border);">
+        <div style="font-size:56px;font-weight:800;color:var(--success);">10%</div>
+        <div style="font-size:var(--small);color:var(--text-muted);margin-top:4px;">operational sample suffices</div>
+        <div style="font-size:var(--tiny);color:var(--text-muted);margin-top:2px;">No original training data required</div>
+      </div>
+    </div>
   </div>
   <span class="slide-number">10 / 11</span>
+  <div class="progress" style="width:90.9%"></div>
 </section>
 
 <!-- Slide 11: Conclusion -->
 <section class="slide-section">
-  <div class="num">Conclusion</div>
-  <h2>Calibration is fragile. Recalibration is practical.</h2>
-  <div class="sub" style="max-width:1000px;line-height:1.5;">
-    Multihorizon hazard models are not inherently robust to operational distribution shift,<br>
-    but a lightweight recalibration step suffices for field deployment.
+  <div class="num anim anim-1">Takeaway</div>
+  <h2 class="anim anim-2">Calibration is fragile.<br>Recalibration is <span style="color:var(--gold);">practical</span>.</h2>
+  <div class="sub anim anim-3" style="max-width:1000px;">
+    Multihorizon hazard models are not inherently robust to<br>operational distribution shift, but a lightweight recalibration<br>step suffices for field deployment.
   </div>
-  <div class="authors" style="margin-top:60px;color:rgba(255,255,255,0.4);font-size:var(--small);">
+  <div class="authors anim anim-4" style="margin-top:60px;color:rgba(255,255,255,0.4);font-size:var(--small);">
     Shikdar &amp; Laaksonen &mdash; University of Vaasa, Finland
   </div>
   <span class="slide-number">11 / 11</span>
+  <div class="progress" style="width:100%"></div>
 </section>
 
 </div>
@@ -541,6 +825,7 @@
   let current = 0;
   const slides = document.querySelectorAll('section');
   const total = slides.length;
+  let blindMode = false;
 
   function showSlide(n) {
     slides.forEach(s => s.classList.remove('active'));
@@ -556,6 +841,24 @@
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextSlide(); }
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
   });
+
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    if (dx < -50) nextSlide();
+    if (dx > 50) prevSlide();
+  });
+
+  function toggleBlind() {
+    blindMode = !blindMode;
+    document.getElementById('blindBtn').style.color = blindMode ? 'var(--gold)' : 'rgba(255,255,255,0.7)';
+    if (blindMode) {
+      slides.forEach(s => s.classList.add('active'));
+    } else {
+      slides.forEach((s, i) => { if (i !== current) s.classList.remove('active'); });
+    }
+  }
 
   function setScale(val) {
     const stage = document.getElementById('stage');
