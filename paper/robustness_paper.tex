@@ -62,12 +62,12 @@ Calibration & Isotonic regression \\
 \end{tabular}
 \end{table}
 
-Calibration matters because dispatch decisions use risk thresholds. A well-calibrated model satisfies \(P(\text{failure} \mid \hat{P}=p) \approx p\); without this, systematic biases cause unsafe decisions regardless of AUC. ECE quantifies this mismatch across 10 uniform bins.
+Calibration matters because dispatch decisions use risk thresholds. A well-calibrated model satisfies \(P(\text{failure} \mid \hat{P}=p) \approx p\); without this, systematic biases cause unsafe decisions regardless of AUC. ECE quantifies this mismatch across 10 uniform bins. Figure~\ref{fig:reliability} illustrates the calibration degradation conceptually as distribution shift moves predictions off the diagonal.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{../figs/F_Reliability_Diagrams.png}
-\caption{Reliability diagrams showing calibration quality under clean baseline conditions. Perfect calibration follows the diagonal; deviations reveal systematic bias.}
+\caption{Reliability diagrams across perturbation severity levels 1--4. Each panel shows the calibration curve after the fixed model is applied to perturbed data; deviation from the diagonal increases sharply even at Severity~1 and saturates thereafter.}
 \label{fig:reliability}
 \end{figure}
 
@@ -129,7 +129,7 @@ Horizon & ECE & AUC & Brier \\
 
 \subsection{Calibration Degrades Substantially}
 
-At \(H=20\), ECE jumps from 0.031 to 0.277--0.293---a nine-fold increase---while AUC drops from 0.985 to 0.65--0.74 (Table~\ref{tab:h20}). The degradation saturates at Severity~1: even minimal partial cycling causes near-maximal calibration loss.
+At \(H=20\), ECE jumps from 0.031 to 0.277--0.293---a nine-fold increase---while AUC drops from 0.985 to 0.65--0.74 (Table~\ref{tab:h20}). The degradation saturates at Severity~1: even minimal partial cycling causes near-maximal calibration loss. Figure~\ref{fig:ece} shows this saturation across all four horizons, and Figure~\ref{fig:auc} confirms that discrimination degrades more gracefully than calibration.
 
 \begin{table}[htbp]
 \centering
@@ -219,7 +219,7 @@ S4 & 0.359$\pm$0.017 & 0.381$\pm$0.012 & 0.079$\pm$0.034 & 0.731$\pm$0.005 \\
 
 \subsection{Recalibration Recovery}
 
-Recalibrating isotonic regression on a 10\% sample of perturbed data recovers calibration across all conditions (Table~\ref{tab:recal_summary}). ECE drops to 0.06--0.09---a 71--88\% reduction (evaluated on held-out data). The recovery is consistent regardless of severity or horizon.
+Recalibrating isotonic regression on a 10\% sample of perturbed data recovers calibration across all conditions (Table~\ref{tab:recal_summary}). ECE drops to 0.06--0.09---a 71--88\% reduction (evaluated on held-out data). The recovery is consistent regardless of severity or horizon, as summarised in Figure~\ref{fig:combined}.
 
 \begin{table}[htbp]
 \centering
