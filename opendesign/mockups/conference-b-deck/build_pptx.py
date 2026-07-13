@@ -248,7 +248,18 @@ add_text_box(slide, Inches(1.5), Inches(6.8), Inches(10), Inches(0.4), "Vmin is 
 add_slide_number(slide, 7)
 
 # ═══════════════════════════════════════════════
-# SLIDE 8: Recalibration result (section)
+# SLIDE 8: Distribution panel
+# ═══════════════════════════════════════════════
+slide = prs.slides.add_slide(prs.slide_layouts[6])
+add_bg(slide, CREAM)
+add_gold_bar(slide)
+add_label(slide, Inches(0.8), Inches(0.4), Inches(4), "DIAGNOSIS")
+add_text_box(slide, Inches(0.8), Inches(0.7), Inches(10), Inches(0.6), "Feature shift across severities", font_size=36, color=NAVY, bold=True)
+add_figure(slide, os.path.join(fig_dir, "fig_dist.png"), Inches(1.0), Inches(1.4), Inches(11.3))
+add_slide_number(slide, 9)
+
+# ═══════════════════════════════════════════════
+# SLIDE 10: Recalibration result (section)
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 add_bg(slide, NAVY)
@@ -294,10 +305,10 @@ for r in range(rows2):
                 paragraph.font.color.rgb = TEXT
 add_text_box(slide, Inches(0.8), Inches(4.5), Inches(5.2), Inches(0.3), "Recovery consistent across all severity levels and horizons", font_size=13, color=TEXT_MUTED)
 add_figure(slide, os.path.join(fig_dir, "fig_combined.png"), Inches(6.5), Inches(1.2), Inches(5.8))
-add_slide_number(slide, 9)
+add_slide_number(slide, 10)
 
 # ═══════════════════════════════════════════════
-# SLIDE 10: Operating zones
+# SLIDE 11: Operating zones
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 add_bg(slide, CREAM)
@@ -312,10 +323,10 @@ add_zone(slide, int(Inches(0.8)), int(zy), int(zw), int(zh), "● Safe", "ECE < 
 add_zone(slide, int(Inches(0.8+3.6+0.4)), int(zy), int(zw), int(zh), "● Warning", "ECE 0.05–0.10", "Recalibrated operation\n10% operational sample", RGBColor(0xFF,0xFB,0xEB), RGBColor(0xFD,0xE6,0x8A), WARN)
 add_zone(slide, int(Inches(0.8+7.2+0.8)), int(zy), int(zw), int(zh), "● Unsafe", "ECE > 0.10", "Direct deployment under\nany partial cycling (ECE > 0.27)", RGBColor(0xFE,0xF2,0xF2), RGBColor(0xFE,0xCA,0xCA), DANGER)
 add_text_box(slide, Inches(0.8), Inches(5.8), Inches(11), Inches(0.4), "Direct deployment under partial cycling pushes ECE > 0.27 — firmly in the unsafe zone", font_size=16, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
-add_slide_number(slide, 10)
+add_slide_number(slide, 11)
 
 # ═══════════════════════════════════════════════
-# SLIDE 11: Deployment path
+# SLIDE 12: Deployment path
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 add_bg(slide, CREAM)
@@ -340,10 +351,10 @@ shape.line.color.rgb = BORDER
 shape.line.width = Pt(1)
 add_text_box(slide, Inches(9.2), Inches(2.2), Inches(3.1), Inches(0.6), "10%", font_size=48, color=SUCCESS, bold=True, alignment=PP_ALIGN.CENTER)
 add_text_box(slide, Inches(9.2), Inches(2.8), Inches(3.1), Inches(0.4), "operational sample suffices", font_size=16, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
-add_slide_number(slide, 11)
+add_slide_number(slide, 12)
 
 # ═══════════════════════════════════════════════
-# SLIDE 12: Conclusion
+# SLIDE 13: Conclusion
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 add_bg(slide, NAVY)
