@@ -557,7 +557,7 @@
 
 <div class="controls" id="controls">
   <button onclick="prevSlide()">&#9664;</button>
-  <span class="page" id="pageNum">1 / 11</span>
+  <span class="page" id="pageNum">1 / 12</span>
   <button onclick="nextSlide()">&#9654;</button>
   <span style="color:rgba(255,255,255,0.2);margin:0 4px;">|</span>
   <button onclick="toggleBlind()" title="Toggle content reveal" style="font-size:14px;letter-spacing:0.05em;" id="blindBtn">BLIND</button>
@@ -581,7 +581,7 @@
   <div class="meta anim anim-2">Robustness of Multihorizon Battery<br>Failure Intelligence Under Realistic Conditions</div>
   <div class="authors anim anim-3">Shikdar &amp; Laaksonen &mdash; University of Vaasa</div>
   <div class="venue anim anim-4">IEEE International Conference on Energy &amp; Power Systems</div>
-  <span class="slide-number">1 / 11</span>
+  <span class="slide-number">1 / 12</span>
   <div class="progress" style="width:9.1%"></div>
 </section>
 
@@ -606,7 +606,7 @@
       </div>
     </div>
   </div>
-  <span class="slide-number">2 / 11</span>
+  <span class="slide-number">2 / 12</span>
   <div class="progress" style="width:18.2%"></div>
 </section>
 
@@ -615,7 +615,7 @@
   <div class="num anim anim-1">Approach</div>
   <h2 class="anim anim-2">Systematic robustness test<br>across four severity levels</h2>
   <div class="sub anim anim-3">Perturb lab data &rarr; apply frozen model &rarr; measure calibration &rarr; test recalibration</div>
-  <span class="slide-number">3 / 11</span>
+  <span class="slide-number">3 / 12</span>
   <div class="progress" style="width:27.3%"></div>
 </section>
 
@@ -639,7 +639,7 @@
       <img src="fig_ece.png" alt="ECE vs Severity">
     </div>
   </div>
-  <span class="slide-number">4 / 11</span>
+  <span class="slide-number">4 / 12</span>
   <div class="progress" style="width:36.4%"></div>
 </section>
 
@@ -676,7 +676,7 @@
       <li class="anim anim-5">AUC drops more gracefully (0.985 &rarr; 0.65&ndash;0.74): discrimination &ne; calibration</li>
     </ul>
   </div>
-  <span class="slide-number">5 / 11</span>
+  <span class="slide-number">5 / 12</span>
   <div class="progress" style="width:45.5%"></div>
 </section>
 
@@ -703,20 +703,32 @@
       <img src="fig_reliability.png" alt="Reliability diagrams">
     </div>
   </div>
-  <span class="slide-number">6 / 11</span>
+  <span class="slide-number">6 / 12</span>
   <div class="progress" style="width:54.5%"></div>
 </section>
 
-<!-- Slide 7: Recalibration result -->
+<!-- Slide 7: SHAP evidence -->
+<section class="slide-content">
+  <div class="label-bar anim anim-1">Evidence</div>
+  <h2 class="anim anim-2">SHAP confirms <span class="highlight">V<sub>min</sub></span> dominance</h2>
+  <div class="fig-full anim anim-3">
+    <img src="fig_shap.png" alt="SHAP feature importance" style="max-height:85%;">
+  </div>
+  <p class="body-sm anim anim-4" style="text-align:center;color:var(--text-muted);">V<sub>min</sub> is the dominant feature under both clean and perturbed regimes. Under perturbation, every feature distribution shifts, breaking the calibrator.</p>
+  <span class="slide-number">7 / 12</span>
+  <div class="progress" style="width:58.3%"></div>
+</section>
+
+<!-- Slide 8: Recalibration result -->
 <section class="slide-section">
   <div class="num anim anim-1">Key result</div>
   <h2 class="anim anim-2">Recalibration on 10%<br>recovers <span style="color:var(--gold);">71&ndash;88%</span> of the gap</h2>
   <div class="sub anim anim-3">ECE drops from ~0.28 to 0.06&ndash;0.09 &bull; evaluated on held-out data</div>
-  <span class="slide-number">7 / 11</span>
-  <div class="progress" style="width:63.6%"></div>
+  <span class="slide-number">8 / 12</span>
+  <div class="progress" style="width:66.7%"></div>
 </section>
 
-<!-- Slide 8: Recalibration detail -->
+<!-- Slide 9: Recalibration detail -->
 <section class="slide-content">
   <div class="label-bar anim anim-1">Evidence</div>
   <h2 class="anim anim-2">Recalibration: <span class="highlight">held-out</span> evaluation</h2>
@@ -736,11 +748,11 @@
       <img src="fig_combined.png" alt="Combined robustness">
     </div>
   </div>
-  <span class="slide-number">8 / 11</span>
-  <div class="progress" style="width:72.7%"></div>
+  <span class="slide-number">9 / 12</span>
+  <div class="progress" style="width:75.0%"></div>
 </section>
 
-<!-- Slide 9: Three operating zones -->
+<!-- Slide 10: Three operating zones -->
 <section class="slide-content">
   <div class="label-bar anim anim-1">Framework</div>
   <h2 class="anim anim-2">Three operating <span class="highlight">zones</span></h2>
@@ -764,11 +776,11 @@
     </div>
     <p class="body-sm anim anim-5" style="text-align:center;color:var(--text-muted);">Direct deployment under partial cycling pushes ECE &gt; 0.27 &mdash; firmly in the unsafe zone</p>
   </div>
-  <span class="slide-number">9 / 11</span>
-  <div class="progress" style="width:81.8%"></div>
+  <span class="slide-number">10 / 12</span>
+  <div class="progress" style="width:83.3%"></div>
 </section>
 
-<!-- Slide 10: Deployment path -->
+<!-- Slide 11: Deployment path -->
 <section class="slide-content">
   <div class="label-bar anim anim-1">Action</div>
   <h2 class="anim anim-2">Practical <span class="highlight">deployment</span> path</h2>
@@ -801,11 +813,11 @@
       </div>
     </div>
   </div>
-  <span class="slide-number">10 / 11</span>
-  <div class="progress" style="width:90.9%"></div>
+  <span class="slide-number">11 / 12</span>
+  <div class="progress" style="width:91.7%"></div>
 </section>
 
-<!-- Slide 11: Conclusion -->
+<!-- Slide 12: Conclusion -->
 <section class="slide-section">
   <div class="num anim anim-1">Takeaway</div>
   <h2 class="anim anim-2">Calibration is fragile.<br>Recalibration is <span style="color:var(--gold);">practical</span>.</h2>
@@ -815,7 +827,7 @@
   <div class="authors anim anim-4" style="margin-top:60px;color:rgba(255,255,255,0.4);font-size:var(--small);">
     Shikdar &amp; Laaksonen &mdash; University of Vaasa, Finland
   </div>
-  <span class="slide-number">11 / 11</span>
+  <span class="slide-number">12 / 12</span>
   <div class="progress" style="width:100%"></div>
 </section>
 

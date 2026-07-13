@@ -248,6 +248,15 @@ Horizon & Clean ECE & Perturbed range & Recalibrated range \\
 
 The primary driver of calibration degradation is the shift in minimum voltage. In full discharge, \(V_{\text{min}}\) reaches approximately 2.3~V. At 75\% DoD truncation (Severity~1), it rises to approximately 3.2~V---a 39\% increase. The XGBoost model learned split thresholds on clean feature ranges, and the isotonic calibrator cannot adapt to the shifted raw probability distribution.
 
+Figure~\ref{fig:shap} confirms this via SHAP feature importance analysis. Under clean laboratory conditions, \(V_{\text{min}}\) is the dominant feature driving failure predictions. Under perturbation, its importance is further amplified while all other features shift in distribution, causing the calibrated probability surface to map to incorrect risk levels.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{../figs/F_SHAP_Vmin.png}
+\caption{SHAP summary plots comparing clean (left) and perturbed (right) operating conditions at \(H=20\). Minimum voltage (\(V_{\text{min}}\)) is the dominant feature in both regimes. Under perturbation, the distribution of every feature shifts, causing the isotonic calibrator to map shifted raw probabilities to incorrect calibrated values.}
+\label{fig:shap}
+\end{figure}
+
 \section{Discussion}
 
 \subsection{Operational Boundary Map}
