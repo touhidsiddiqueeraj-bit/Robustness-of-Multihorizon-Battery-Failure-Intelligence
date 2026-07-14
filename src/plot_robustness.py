@@ -114,7 +114,7 @@ def main():
         ax.grid(True, alpha=0.3)
 
     plt.tight_layout()
-    fig.savefig(os.path.join(FIGS_DIR, "F_Reliability_Diagrams.png"), dpi=150)
+    fig.savefig(os.path.join(FIGS_DIR, "F_Reliability_Diagrams.png"), dpi=150, bbox_inches="tight")
     print("Saved: F_Reliability_Diagrams.png")
 
     # ---- Fig 2: ECE vs Severity ----
@@ -155,7 +155,7 @@ def main():
     ax.legend()
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
-    fig.savefig(os.path.join(FIGS_DIR, "F_ECE_vs_Severity.png"), dpi=150)
+    fig.savefig(os.path.join(FIGS_DIR, "F_ECE_vs_Severity.png"), dpi=150, bbox_inches="tight")
     print("Saved: F_ECE_vs_Severity.png")
 
     # ---- Fig 3: AUC vs Severity ----
@@ -178,7 +178,7 @@ def main():
     ax.grid(True, alpha=0.3)
     ax.set_ylim(0.5, 1.0)
     plt.tight_layout()
-    fig.savefig(os.path.join(FIGS_DIR, "F_AUC_vs_Severity.png"), dpi=150)
+    fig.savefig(os.path.join(FIGS_DIR, "F_AUC_vs_Severity.png"), dpi=150, bbox_inches="tight")
     print("Saved: F_AUC_vs_Severity.png")
 
     # ---- Fig 4: Combined figure (2x2: reliability + ECE + AUC + table) ----
@@ -278,7 +278,7 @@ def main():
             table[i, j].set_facecolor("#f0f0f0" if i % 2 == 0 else "white")
     ax.set_title("Summary Table", fontsize=12, pad=8)
 
-    fig.savefig(os.path.join(FIGS_DIR, "F_Combined_Robustness.png"), dpi=150)
+    fig.savefig(os.path.join(FIGS_DIR, "F_Combined_Robustness.png"), dpi=150, bbox_inches="tight")
     print("Saved: F_Combined_Robustness.png")
 
     print("\nAll figures saved.")

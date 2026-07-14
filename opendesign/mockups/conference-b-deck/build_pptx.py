@@ -82,12 +82,12 @@ def add_card(slide, left, top, width, height, num_text, label_text, sub_text="",
     if border_color:
         shape.line.color.rgb = border_color
         shape.line.width = Pt(3)
-    # number
-    tf = add_text_box(slide, left + 40000, top + 20000, width - 80000, Inches(0.7), num_text, font_size=36, color=NAVY, bold=True, alignment=PP_ALIGN.CENTER)
-    # label
-    add_text_box(slide, left + 40000, top + height - 85000, width - 80000, Inches(0.35), label_text, font_size=14, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
+    # number in upper portion
+    add_text_box(slide, left + 40000, top + Inches(0.2), width - 80000, Inches(1.4), num_text, font_size=36, color=NAVY, bold=True, alignment=PP_ALIGN.CENTER)
+    # label in lower portion
+    add_text_box(slide, left + 40000, top + height - Inches(0.9), width - 80000, Inches(0.5), label_text, font_size=14, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
     if sub_text:
-        add_text_box(slide, left + 40000, top + height - 50000, width - 80000, Inches(0.25), sub_text, font_size=11, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
+        add_text_box(slide, left + 40000, top + height - Inches(0.45), width - 80000, Inches(0.25), sub_text, font_size=11, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
 
 def add_zone(slide, left, top, width, height, title, ece, desc, bg_color, border_color, title_color):
     shape = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Emu(left), Emu(top), Emu(width), Emu(height))
@@ -119,15 +119,15 @@ slide = prs.slides.add_slide(prs.slide_layouts[6])
 add_bg(slide, CREAM)
 add_gold_bar(slide)
 add_label(slide, Inches(0.8), Inches(0.4), Inches(4), "MOTIVATION")
-add_text_box(slide, Inches(0.8), Inches(0.7), Inches(8), Inches(0.6), "Lab results don't travel", font_size=36, color=NAVY, bold=True)
-add_text_box(slide, Inches(0.8), Inches(1.5), Inches(5.5), Inches(0.5), "The published hazard model was trained on clean lab data: full cycles, fixed C-rates, controlled temperatures.", font_size=18, color=TEXT)
-add_text_box(slide, Inches(0.8), Inches(2.2), Inches(5.5), Inches(0.4), "Real BESS operation is fundamentally different:", font_size=18, color=TEXT)
+add_text_box(slide, Inches(1.2), Inches(0.7), Inches(8), Inches(0.6), "Lab results don't travel", font_size=36, color=NAVY, bold=True)
+add_text_box(slide, Inches(1.2), Inches(1.6), Inches(5.5), Inches(0.6), "The published hazard model was trained on clean lab data: full cycles, fixed C-rates, controlled temperatures.", font_size=18, color=TEXT)
+add_text_box(slide, Inches(1.2), Inches(2.4), Inches(5.5), Inches(0.4), "Real BESS operation is fundamentally different:", font_size=18, color=TEXT)
 items = [
     "Partial cycling — varying depths of discharge",
     "Temperature noise — sensor drift, thermal gradients",
     "Irregular rest — variable idle between cycles"
 ]
-tf = add_text_box(slide, Inches(0.8), Inches(2.8), Inches(5.5), Inches(2.5), "• " + items[0], font_size=18, color=TEXT)
+tf = add_text_box(slide, Inches(1.2), Inches(3.0), Inches(5.5), Inches(2.5), "• " + items[0], font_size=18, color=TEXT)
 for item in items[1:]:
     add_para(tf, "• " + item, font_size=18, color=TEXT, space_before=6)
 # Warning box on right
@@ -202,20 +202,19 @@ cards = [
     ("S1 saturates", "Near-max loss", "Even 75–100% DoD", DANGER),
 ]
 card_w = Inches(2.8)
-card_h = Inches(1.6)
+card_h = Inches(2.6)
 gap = Inches(0.2)
-total_w = (Inches(0.8) * 2) + (card_w * 4) + (gap * 3)
 start_x = Inches(0.8)
 for i, (num, label, sub, color) in enumerate(cards):
     x = start_x + (card_w + gap) * i
-    add_card(slide, int(x), int(Inches(1.5)), int(card_w), int(card_h), num, label, sub, color)
+    add_card(slide, int(x), int(Inches(0.8)), int(card_w), int(card_h), num, label, sub, color)
 
 items = [
     "ECE jumps 0.031 → 0.277–0.293 — a nine-fold increase at H=20",
     "Degradation saturates at Severity 1: even minimal partial cycling causes near-max loss",
     "AUC drops more gracefully (0.985 → 0.65–0.74): discrimination ≠ calibration",
 ]
-tf = add_text_box(slide, Inches(0.8), Inches(3.5), Inches(11), Inches(3.0), "• " + items[0], font_size=18, color=TEXT)
+tf = add_text_box(slide, Inches(0.8), Inches(3.6), Inches(11), Inches(3.0), "• " + items[0], font_size=18, color=TEXT)
 for item in items[1:]:
     add_para(tf, "• " + item, font_size=18, color=TEXT, space_before=8)
 add_slide_number(slide, 5)
@@ -229,9 +228,16 @@ add_gold_bar(slide)
 add_label(slide, Inches(0.8), Inches(0.4), Inches(4), "DIAGNOSIS")
 add_text_box(slide, Inches(0.8), Inches(0.7), Inches(8), Inches(0.6), "Root cause: Vmin shift", font_size=36, color=NAVY, bold=True)
 add_text_box(slide, Inches(0.8), Inches(1.4), Inches(5.5), Inches(0.5), "The primary driver is a shift in the minimum voltage feature under partial cycling.", font_size=18, color=TEXT)
-add_card(slide, int(Inches(0.8)), int(Inches(2.2)), int(Inches(2.4)), int(Inches(1.4)), "2.3 V", "Full discharge", "", BORDER)
-add_card(slide, int(Inches(3.5)), int(Inches(2.2)), int(Inches(2.4)), int(Inches(1.4)), "3.2 V", "75% DoD truncation", "", DANGER)
-add_text_box(slide, Inches(0.8), Inches(3.9), Inches(5.5), Inches(0.8), "A 39% increase — the XGBoost model learned thresholds on clean ranges; the isotonic calibrator can't adapt to the shifted distribution.", font_size=16, color=TEXT_MUTED)
+# Inline cards (use add_card base but with taller boxes to avoid text overlap)
+for ci, (x, num, lbl, bcolor) in enumerate([
+    (Inches(0.8), "2.3 V", "Full discharge", BORDER),
+    (Inches(3.5), "3.2 V", "75% DoD truncation", DANGER),
+]):
+    shape = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Emu(x), Emu(Inches(2.0)), Emu(Inches(2.4)), Emu(Inches(1.8)))
+    shape.fill.solid(); shape.fill.fore_color.rgb = WHITE; shape.line.color.rgb = bcolor; shape.line.width = Pt(3)
+    add_text_box(slide, int(x + 40000), int(Inches(2.1)), int(Inches(2.4) - 80000), Inches(0.8), num, font_size=36, color=NAVY, bold=True, alignment=PP_ALIGN.CENTER)
+    add_text_box(slide, int(x + 40000), int(Inches(2.9)), int(Inches(2.4) - 80000), Inches(0.5), lbl, font_size=14, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
+add_text_box(slide, Inches(0.8), Inches(4.1), Inches(5.5), Inches(0.8), "A 39% increase — the XGBoost model learned thresholds on clean ranges; the isotonic calibrator can't adapt to the shifted distribution.", font_size=16, color=TEXT_MUTED)
 add_figure(slide, os.path.join(fig_dir, "fig_reliability.png"), Inches(6.5), Inches(1.2), Inches(5.8))
 add_slide_number(slide, 6)
 
@@ -276,8 +282,8 @@ slide = prs.slides.add_slide(prs.slide_layouts[6])
 add_bg(slide, CREAM)
 add_gold_bar(slide)
 add_label(slide, Inches(0.8), Inches(0.4), Inches(4), "EVIDENCE")
-add_text_box(slide, Inches(0.8), Inches(0.7), Inches(8), Inches(0.5), "Recalibration: held-out evaluation", font_size=36, color=NAVY, bold=True)
-add_text_box(slide, Inches(0.8), Inches(1.3), Inches(5.2), Inches(0.4), "Both isotonic and Platt recalibration recover calibration. Mean±std across 5 seeds × 4 severities:", font_size=15, color=TEXT)
+add_text_box(slide, Inches(0.8), Inches(0.6), Inches(8), Inches(0.7), "Recalibration: held-out evaluation", font_size=36, color=NAVY, bold=True)
+add_text_box(slide, Inches(0.8), Inches(1.6), Inches(5.2), Inches(0.5), "All three recalibration methods recover calibration on held-out data. Mean±std across 5 seeds × 4 severities:", font_size=15, color=TEXT)
 tbl2_data = [
     ["Horizon", "Clean ECE", "Perturbed", "Isotonic", "Platt", "Temp."],
     ["H=10", "0.010", "0.297±0.017", "0.067±0.022", "0.064±0.013", "0.066±0.024"],
@@ -326,10 +332,10 @@ slide = prs.slides.add_slide(prs.slide_layouts[6])
 add_bg(slide, CREAM)
 add_gold_bar(slide)
 add_label(slide, Inches(0.8), Inches(0.4), Inches(4), "ROBUSTNESS")
-add_text_box(slide, Inches(0.8), Inches(0.7), Inches(10), Inches(0.6), "Domain randomization: modest extra gain", font_size=36, color=NAVY, bold=True)
-add_text_box(slide, Inches(0.8), Inches(1.3), Inches(6.0), Inches(0.4), "Training on perturbed data provides additional protection at longer horizons.", font_size=16, color=TEXT)
-add_figure(slide, os.path.join(fig_dir, "fig_dr.png"), Inches(0.5), Inches(1.9), Inches(7.5))
-add_text_box(slide, Inches(0.5), Inches(6.4), Inches(7.5), Inches(0.4), "DR+H=50 ECE=0.047 vs. standard+isotonic H=50 ECE=0.087 (45% reduction). Minimal gain at H=10.", font_size=13, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
+add_text_box(slide, Inches(0.8), Inches(0.5), Inches(10), Inches(0.8), "Domain randomization: modest extra gain", font_size=32, color=NAVY, bold=True)
+add_text_box(slide, Inches(0.8), Inches(2.0), Inches(6.0), Inches(0.4), "Training on perturbed data provides additional protection at longer horizons.", font_size=16, color=TEXT)
+add_figure(slide, os.path.join(fig_dir, "fig_dr.png"), Inches(0.5), Inches(2.7), Inches(7.5))
+add_text_box(slide, Inches(0.5), Inches(6.2), Inches(7.5), Inches(0.4), "DR+H=50 ECE=0.047 vs. standard+isotonic H=50 ECE=0.087 (45% reduction). Minimal gain at H=10.", font_size=14, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
 # Side panel
 shape = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Emu(Inches(8.5)), Emu(Inches(1.5)), Emu(Inches(4.0)), Emu(Inches(4.5)))
 shape.fill.solid()
@@ -386,15 +392,15 @@ for step in steps[1:]:
     add_para(tf, step, font_size=20, color=TEXT, space_before=10)
 add_text_box(slide, Inches(0.8), Inches(4.8), Inches(7.5), Inches(0.4), "No original training data required · No additional feature engineering", font_size=14, color=TEXT_MUTED)
 # Highlight box
-shape = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Emu(Inches(9.0)), Emu(Inches(2.0)), Emu(Inches(3.5)), Emu(Inches(2.0)))
+shape = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Emu(Inches(9.0)), Emu(Inches(2.0)), Emu(Inches(3.5)), Emu(Inches(2.5)))
 shape.fill.solid()
 shape.fill.fore_color.rgb = WHITE
 shape.line.color.rgb = BORDER
 shape.line.width = Pt(1)
-add_text_box(slide, Inches(9.2), Inches(2.0), Inches(3.1), Inches(0.5), "10%", font_size=42, color=SUCCESS, bold=True, alignment=PP_ALIGN.CENTER)
-add_text_box(slide, Inches(9.2), Inches(2.5), Inches(3.1), Inches(0.3), "operational sample", font_size=16, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
-add_text_box(slide, Inches(9.2), Inches(2.9), Inches(3.1), Inches(0.3), "at the elbow of", font_size=14, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
-add_text_box(slide, Inches(9.2), Inches(3.2), Inches(3.1), Inches(0.3), "the ECE curve", font_size=14, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
+add_text_box(slide, Inches(9.2), Inches(2.1), Inches(3.1), Inches(0.6), "10%", font_size=42, color=SUCCESS, bold=True, alignment=PP_ALIGN.CENTER)
+add_text_box(slide, Inches(9.2), Inches(2.7), Inches(3.1), Inches(0.5), "operational sample", font_size=16, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
+add_text_box(slide, Inches(9.2), Inches(3.2), Inches(3.1), Inches(0.4), "at the elbow of", font_size=14, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
+add_text_box(slide, Inches(9.2), Inches(3.5), Inches(3.1), Inches(0.4), "the ECE curve", font_size=14, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
 add_slide_number(slide, 14)
 
 # ═══════════════════════════════════════════════

@@ -52,7 +52,7 @@ def main():
 
     plt.tight_layout()
     out = os.path.join(FIGS_DIR, "F_Sample_Sweep.png")
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=150, bbox_inches="tight")
     print(f"Saved: {out}")
 
 

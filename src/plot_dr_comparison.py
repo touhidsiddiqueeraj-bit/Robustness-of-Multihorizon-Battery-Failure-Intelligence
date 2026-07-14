@@ -57,6 +57,6 @@ for ax, (std_col, dr_col, label) in zip(axes, [
 
 plt.tight_layout()
 out = os.path.join(FIGS, "F_DR_Comparison.png")
-plt.savefig(out, dpi=200)
+plt.savefig(out, dpi=200, bbox_inches="tight")
 plt.close()
 print(f"Saved: {out}")

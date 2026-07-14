@@ -47,7 +47,7 @@ ax.annotate(f"{means['S1']:.2f}V", xy=(1, means['S1']), xytext=(0.7, means['S1']
 # bracket showing the gap
 ax.annotate("", xy=(0, means['Clean']), xytext=(1, means['S1']),
             arrowprops=dict(arrowstyle="<->", color="#64748b", lw=1.5))
-ax.text(0.5, max(means['Clean'], means['S1']) + 0.35, f"+{(means['S1']/means['Clean'] - 1)*100:.0f}%", ha="center", fontsize=13, fontweight="bold", color="#64748b")
+ax.text(0.5, max(means['Clean'], means['S1']) + 0.55, f"+{(means['S1']/means['Clean'] - 1)*100:.0f}%", ha="center", fontsize=14, fontweight="bold", color="#64748b")
 
 ax.set_title("Minimum voltage shift across severity levels", fontsize=15, fontweight="bold", pad=14)
 sns.despine()
