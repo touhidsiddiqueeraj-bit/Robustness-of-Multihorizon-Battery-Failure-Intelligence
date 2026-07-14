@@ -66,7 +66,7 @@ def add_para(tf, text, font_size=18, color=TEXT, bold=False, alignment=PP_ALIGN.
 def add_label(slide, left, top, width, text):
     add_text_box(slide, left, top, width, Inches(0.3), text, font_size=11, color=GOLD, bold=True)
 
-def add_slide_number(slide, num, total=11):
+def add_slide_number(slide, num, total=14):
     add_text_box(slide, Inches(11.2), Inches(7.0), Inches(1.5), Inches(0.3), f"{num} / {total}", font_size=10, color=TEXT_MUTED, alignment=PP_ALIGN.RIGHT)
 
 def add_figure(slide, path, left, top, width):
@@ -256,10 +256,10 @@ add_gold_bar(slide)
 add_label(slide, Inches(0.8), Inches(0.4), Inches(4), "DIAGNOSIS")
 add_text_box(slide, Inches(0.8), Inches(0.7), Inches(10), Inches(0.6), "Feature shift across severities", font_size=36, color=NAVY, bold=True)
 add_figure(slide, os.path.join(fig_dir, "fig_dist.png"), Inches(1.0), Inches(1.4), Inches(11.3))
-add_slide_number(slide, 9)
+add_slide_number(slide, 8)
 
 # ═══════════════════════════════════════════════
-# SLIDE 10: Recalibration result (section)
+# SLIDE 9: Recalibration result (section)
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 add_bg(slide, NAVY)
@@ -267,48 +267,60 @@ add_gold_bar(slide)
 add_text_box(slide, Inches(1.5), Inches(0.5), Inches(10), Inches(0.3), "KEY RESULT", font_size=11, color=GOLD, bold=True, alignment=PP_ALIGN.CENTER)
 add_text_box(slide, Inches(1.5), Inches(1.5), Inches(10), Inches(2.0), "Recalibration on 10%\nrecovers 71–88% of the gap", font_size=48, color=WHITE, bold=True, alignment=PP_ALIGN.CENTER)
 add_text_box(slide, Inches(1.5), Inches(3.8), Inches(10), Inches(0.8), "ECE drops from ~0.28 to 0.06–0.09\nEvaluated on held-out data", font_size=22, color=RGBColor(0xAA,0xAA,0xAA), alignment=PP_ALIGN.CENTER)
-add_slide_number(slide, 7)
+add_slide_number(slide, 9)
 
 # ═══════════════════════════════════════════════
-# SLIDE 8: Recalibration detail
+# SLIDE 10: Recalibration detail
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 add_bg(slide, CREAM)
 add_gold_bar(slide)
 add_label(slide, Inches(0.8), Inches(0.4), Inches(4), "EVIDENCE")
 add_text_box(slide, Inches(0.8), Inches(0.7), Inches(8), Inches(0.6), "Recalibration: held-out evaluation", font_size=36, color=NAVY, bold=True)
-add_text_box(slide, Inches(0.8), Inches(1.3), Inches(5.2), Inches(0.4), "Isotonic regression fit on 10%, evaluated on held-out 90%:", font_size=16, color=TEXT)
+add_text_box(slide, Inches(0.8), Inches(1.0), Inches(5.2), Inches(0.5), "Both isotonic and Platt recalibration recover calibration. Mean±std across 5 seeds × 4 severities:", font_size=15, color=TEXT)
 tbl2_data = [
-    ["Horizon", "Clean ECE", "Perturbed", "Recalibrated"],
-    ["H=10", "0.010", "0.272–0.313", "0.057–0.076"],
-    ["H=20", "0.031", "0.277–0.293", "0.060–0.073"],
-    ["H=30", "0.013", "0.288–0.316", "0.076–0.092"],
-    ["H=50", "0.023", "0.331–0.381", "0.080–0.094"],
+    ["Horizon", "Clean ECE", "Perturbed", "Isotonic", "Platt"],
+    ["H=10", "0.010", "0.297±0.017", "0.067±0.022", "0.064±0.013"],
+    ["H=20", "0.031", "0.286±0.012", "0.067±0.027", "0.083±0.037"],
+    ["H=30", "0.013", "0.299±0.014", "0.081±0.024", "0.079±0.036"],
+    ["H=50", "0.023", "0.362±0.022", "0.086±0.028", "0.076±0.036"],
 ]
-rows2, cols2 = 5, 4
-table2_shape = slide.shapes.add_table(rows2, cols2, Emu(Inches(0.8)), Emu(Inches(1.9)), Emu(Inches(5.2)), Emu(Inches(2.5)))
+rows2, cols2 = 5, 5
+table2_shape = slide.shapes.add_table(rows2, cols2, Emu(Inches(0.8)), Emu(Inches(1.7)), Emu(Inches(6.2)), Emu(Inches(2.5)))
 table2 = table2_shape.table
 for r in range(rows2):
     for c in range(cols2):
         cell = table2.cell(r, c)
         cell.text = tbl2_data[r][c]
         for paragraph in cell.text_frame.paragraphs:
-            paragraph.font.size = Pt(13)
+            paragraph.font.size = Pt(12)
             paragraph.font.name = "Calibri"
             if r == 0:
                 paragraph.font.bold = True
                 paragraph.font.color.rgb = NAVY
-            elif c == 3:
+            elif c in (3, 4):
                 paragraph.font.bold = True
                 paragraph.font.color.rgb = SUCCESS
             else:
                 paragraph.font.color.rgb = TEXT
-add_text_box(slide, Inches(0.8), Inches(4.5), Inches(5.2), Inches(0.3), "Recovery consistent across all severity levels and horizons", font_size=13, color=TEXT_MUTED)
-add_figure(slide, os.path.join(fig_dir, "fig_combined.png"), Inches(6.5), Inches(1.2), Inches(5.8))
+add_text_box(slide, Inches(0.8), Inches(4.5), Inches(6.2), Inches(0.3), "Isotonic and Platt perform comparably — recalibration itself matters, not the method", font_size=13, color=TEXT_MUTED)
+add_figure(slide, os.path.join(fig_dir, "fig_combined.png"), Inches(7.0), Inches(1.0), Inches(5.5))
 add_slide_number(slide, 10)
 
 # ═══════════════════════════════════════════════
-# SLIDE 11: Operating zones
+# SLIDE 11: Sample-size sweep
+# ═══════════════════════════════════════════════
+slide = prs.slides.add_slide(prs.slide_layouts[6])
+add_bg(slide, CREAM)
+add_gold_bar(slide)
+add_label(slide, Inches(0.8), Inches(0.4), Inches(4), "ABLATION")
+add_text_box(slide, Inches(0.8), Inches(0.7), Inches(10), Inches(0.6), "Sample-size sweep: 5%–50%", font_size=36, color=NAVY, bold=True)
+add_figure(slide, os.path.join(fig_dir, "fig_sweep.png"), Inches(1.0), Inches(1.4), Inches(8.0))
+add_text_box(slide, Inches(1.0), Inches(6.5), Inches(9.0), Inches(0.5), "ECE decreases monotonically with sample fraction. The 10% fraction used throughout sits at the elbow — diminishing returns above 20%.", font_size=15, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
+add_slide_number(slide, 11)
+
+# ═══════════════════════════════════════════════
+# SLIDE 12: Operating zones
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 add_bg(slide, CREAM)
@@ -323,10 +335,10 @@ add_zone(slide, int(Inches(0.8)), int(zy), int(zw), int(zh), "● Safe", "ECE < 
 add_zone(slide, int(Inches(0.8+3.6+0.4)), int(zy), int(zw), int(zh), "● Warning", "ECE 0.05–0.10", "Recalibrated operation\n10% operational sample", RGBColor(0xFF,0xFB,0xEB), RGBColor(0xFD,0xE6,0x8A), WARN)
 add_zone(slide, int(Inches(0.8+7.2+0.8)), int(zy), int(zw), int(zh), "● Unsafe", "ECE > 0.10", "Direct deployment under\nany partial cycling (ECE > 0.27)", RGBColor(0xFE,0xF2,0xF2), RGBColor(0xFE,0xCA,0xCA), DANGER)
 add_text_box(slide, Inches(0.8), Inches(5.8), Inches(11), Inches(0.4), "Direct deployment under partial cycling pushes ECE > 0.27 — firmly in the unsafe zone", font_size=16, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
-add_slide_number(slide, 11)
+add_slide_number(slide, 12)
 
 # ═══════════════════════════════════════════════
-# SLIDE 12: Deployment path
+# SLIDE 13: Deployment path
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 add_bg(slide, CREAM)
@@ -349,12 +361,14 @@ shape.fill.solid()
 shape.fill.fore_color.rgb = WHITE
 shape.line.color.rgb = BORDER
 shape.line.width = Pt(1)
-add_text_box(slide, Inches(9.2), Inches(2.2), Inches(3.1), Inches(0.6), "10%", font_size=48, color=SUCCESS, bold=True, alignment=PP_ALIGN.CENTER)
-add_text_box(slide, Inches(9.2), Inches(2.8), Inches(3.1), Inches(0.4), "operational sample suffices", font_size=16, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
-add_slide_number(slide, 12)
+add_text_box(slide, Inches(9.2), Inches(2.0), Inches(3.1), Inches(0.5), "10%", font_size=42, color=SUCCESS, bold=True, alignment=PP_ALIGN.CENTER)
+add_text_box(slide, Inches(9.2), Inches(2.5), Inches(3.1), Inches(0.3), "operational sample", font_size=16, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
+add_text_box(slide, Inches(9.2), Inches(2.9), Inches(3.1), Inches(0.3), "at the elbow of", font_size=14, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
+add_text_box(slide, Inches(9.2), Inches(3.2), Inches(3.1), Inches(0.3), "the ECE curve", font_size=14, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
+add_slide_number(slide, 13)
 
 # ═══════════════════════════════════════════════
-# SLIDE 13: Conclusion
+# SLIDE 14: Conclusion
 # ═══════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 add_bg(slide, NAVY)
@@ -363,7 +377,7 @@ add_text_box(slide, Inches(1.5), Inches(0.5), Inches(10), Inches(0.3), "TAKEAWAY
 add_text_box(slide, Inches(1.5), Inches(1.5), Inches(10), Inches(2.0), "Calibration is fragile.\nRecalibration is practical.", font_size=48, color=WHITE, bold=True, alignment=PP_ALIGN.CENTER)
 add_text_box(slide, Inches(1.5), Inches(3.8), Inches(10), Inches(1.2), "Multihorizon hazard models are not inherently robust to\noperational distribution shift, but a lightweight recalibration\nstep suffices for field deployment.", font_size=22, color=RGBColor(0xAA,0xAA,0xAA), alignment=PP_ALIGN.CENTER)
 add_text_box(slide, Inches(1.5), Inches(5.8), Inches(10), Inches(0.4), "Shikdar & Laaksonen — University of Vaasa, Finland", font_size=16, color=RGBColor(0x88,0x88,0x88), alignment=PP_ALIGN.CENTER)
-add_slide_number(slide, 11)
+add_slide_number(slide, 14)
 
 out = os.path.join(fig_dir, "robustness_presentation.pptx")
 prs.save(out)

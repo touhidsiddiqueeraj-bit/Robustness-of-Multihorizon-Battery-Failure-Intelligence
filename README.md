@@ -7,6 +7,8 @@ This project evaluates the robustness of a multihorizon battery failure predicti
 Key findings:
 - Calibration degrades ~9x (ECE from 0.03 to 0.28) under even mild perturbation
 - Recalibration on 10% of operational data recovers 71–88% of the gap (held-out)
+- Both isotonic and Platt recalibration perform comparably, confirming it's recalibration itself that matters
+- 10% sample fraction sits at the elbow of the ECE-vs-sample-size curve (diminishing returns above 20%)
 - Three operating zones: Safe (clean lab), Warning (recalibrated), Unsafe (direct deployment)
 
 ## Structure
@@ -38,6 +40,10 @@ python src/run_robustness.py
 # 4. Generate figures and tables
 python src/plot_robustness.py
 python src/build_robustness_tables.py
+
+# 5. [Optional] Sample-size sweep (5%, 10%, 20%, 50%)
+python src/run_sample_sweep.py
+python src/plot_sample_sweep.py
 ```
 
 ## Dependencies

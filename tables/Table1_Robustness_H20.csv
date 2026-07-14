@@ -1,6 +1,6 @@
-Severity,ECE (raw),ECE (cal),ECE (recal),AUC
-Clean,—,0.031,—,0.985
-S1 (mild),0.226,0.286,0.068,0.741
-S2 (moderate),0.212,0.288,0.073,0.681
-S3 (severe),0.204,0.277,0.060,0.674
-S4 (aggressive),0.220,0.293,0.068,0.652
+Severity,ECE (raw),ECE (cal),ECE (recal),ECE (Platt),AUC
+Clean,—,0.031,—,—,0.985
+S1 (mild),0.226,0.286,0.068,0.093,0.741
+S2 (moderate),0.212,0.288,0.073,0.077,0.681
+S3 (severe),0.204,0.277,0.060,0.088,0.674
+S4 (aggressive),0.220,0.293,0.068,0.076,0.652

@@ -5,6 +5,7 @@ import joblib
 
 from sklearn.metrics import brier_score_loss, roc_auc_score
 from sklearn.isotonic import IsotonicRegression
+from sklearn.linear_model import LogisticRegression
 
 from compute_ece import compute_ece
 
@@ -102,10 +103,19 @@ def main():
 
                 row["ece_recal"] = compute_ece(y[~mask], p_recal[~mask])
 
+                # Platt (sigmoid) recalibration
+                if len(np.unique(y[mask])) >= 2:
+                    platt = LogisticRegression(C=9999)
+                    platt.fit(p_raw[mask].reshape(-1, 1), y[mask])
+                    p_recal_platt = platt.predict_proba(p_raw.reshape(-1, 1))[:, 1]
+                else:
+                    p_recal_platt = p_cal.copy()
+                row["ece_recal_platt"] = compute_ece(y[~mask], p_recal_platt[~mask])
+
                 results.append(row)
                 print(f"s={severity} seed={seed} H={H}: "
                       f"ece_raw={row['ece_raw']:.4f} ece_cal={row['ece_cal']:.4f} "
-                      f"ece_recal={row['ece_recal']:.4f} auc_cal={row['auc_cal']:.4f}")
+                      f"ece_recal={row['ece_recal']:.4f} platt={row['ece_recal_platt']:.4f}")
 
     results_df = pd.DataFrame(results)
     out_path = os.path.join(RESULTS_DIR, "robustness_results.csv")

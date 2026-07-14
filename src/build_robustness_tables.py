@@ -34,6 +34,7 @@ t1 = pd.DataFrame({
     "ECE (raw)": ["—"] + [f"{h20[h20.severity==s].ece_raw.mean():.3f}" for s in [1,2,3,4]],
     "ECE (cal)": [f"{_clean_ece(20):.3f}"] + [f"{h20[h20.severity==s].ece_cal.mean():.3f}" for s in [1,2,3,4]],
     "ECE (recal)": ["—"] + [f"{h20[h20.severity==s].ece_recal.mean():.3f}" for s in [1,2,3,4]],
+    "ECE (Platt)": ["—"] + [f"{h20[h20.severity==s].ece_recal_platt.mean():.3f}" for s in [1,2,3,4]],
     "AUC": [f"{_clean_auc(20):.3f}"] + [f"{h20[h20.severity==s].auc_cal.mean():.3f}" for s in [1,2,3,4]],
 })
 t1.to_csv(os.path.join(TABLES, "Table1_Robustness_H20.csv"), index=False)
@@ -46,17 +47,22 @@ for H in [10, 20, 30, 50]:
         ss = sub[sub.severity == s]
         rows.append({"Horizon": f"H={H}", "Severity": s,
             "ECE (cal)": f"{ss.ece_cal.mean():.3f}", "ECE (recal)": f"{ss.ece_recal.mean():.3f}",
+            "ECE (Platt)": f"{ss.ece_recal_platt.mean():.3f}",
             "AUC": f"{ss.auc_cal.mean():.3f}"})
 t2 = pd.DataFrame(rows)
 t2.to_csv(os.path.join(TABLES, "Table2_Robustness_AllHorizons.csv"), index=False)
 
-# Table 3: Recalibration recovery
+# Table 3: Recalibration recovery (mean +/- std across seeds per severity)
 rows3 = []
 for H in [10, 20, 30, 50]:
     sub = df[df.H == H]
-    rows3.append({"Horizon": f"H={H}", "Clean ECE": f"{_clean_ece(H):.3f}",
-        "Perturbed": f"{sub.ece_cal.min():.3f}--{sub.ece_cal.max():.3f}",
-        "Recalibrated": f"{sub.ece_recal.min():.3f}--{sub.ece_recal.max():.3f}"})
+    for s in [1, 2, 3, 4]:
+        ss = sub[sub.severity == s]
+        rows3.append({"Horizon": f"H={H}", "Severity": s,
+            "Clean ECE": f"{_clean_ece(H):.3f}",
+            "Perturbed": f"{ss.ece_cal.mean():.3f}$\\pm${ss.ece_cal.std():.3f}",
+            "Recal (iso)": f"{ss.ece_recal.mean():.3f}$\\pm${ss.ece_recal.std():.3f}",
+            "Recal (Platt)": f"{ss.ece_recal_platt.mean():.3f}$\\pm${ss.ece_recal_platt.std():.3f}"})
 t3 = pd.DataFrame(rows3)
 t3.to_csv(os.path.join(TABLES, "Table3_Recalibration_Recovery.csv"), index=False)
 

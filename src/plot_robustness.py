@@ -123,10 +123,11 @@ def main():
     severities = [1, 2, 3, 4]
     methods = {
         "Fixed calibrator": "ece_cal",
-        "Recalibrated (10%)": "ece_recal",
+        "Recalibrated (isotonic)": "ece_recal",
+        "Recalibrated (Platt)": "ece_recal_platt",
     }
-    colors = {"Fixed calibrator": "crimson", "Recalibrated (10%)": "seagreen"}
-    markers = {"Fixed calibrator": "o", "Recalibrated (10%)": "s"}
+    colors = {"Fixed calibrator": "crimson", "Recalibrated (isotonic)": "seagreen", "Recalibrated (Platt)": "purple"}
+    markers = {"Fixed calibrator": "o", "Recalibrated (isotonic)": "s", "Recalibrated (Platt)": "D"}
 
     for label, col in methods.items():
         means = []

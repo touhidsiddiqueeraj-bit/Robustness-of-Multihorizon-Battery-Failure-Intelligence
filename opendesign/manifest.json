@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-13T12:30:00Z",
+  "generated": "2026-07-14T10:00:00Z",
   "sections": [
     {
       "id": "mockups",
@@ -8,12 +8,7 @@
         {
           "slug": "conference-b-deck",
           "files": [
-            { "label": "Presentation Deck", "path": "mockups/conference-b-deck/index.html" },
-            { "label": "ECE vs Severity", "path": "mockups/conference-b-deck/fig_ece.png" },
-            { "label": "AUC vs Severity", "path": "mockups/conference-b-deck/fig_auc.png" },
-            { "label": "Combined Robustness", "path": "mockups/conference-b-deck/fig_combined.png" },
-            { "label": "Reliability Diagrams", "path": "mockups/conference-b-deck/fig_reliability.png" },
-            { "label": "Table H20", "path": "mockups/conference-b-deck/table_h20.png" }
+            { "label": "robustness_presentation.pptx", "path": "mockups/conference-b-deck/robustness_presentation.pptx" }
           ]
         }
       ]
