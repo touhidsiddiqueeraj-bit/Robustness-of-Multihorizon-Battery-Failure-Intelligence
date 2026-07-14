@@ -17,8 +17,7 @@ Under Realistic Operating Conditions}
 \author{Tareq Anwar Shikdar\textsuperscript{*}\thanks{Corresponding author.} \and Hannu Laaksonen\\
 Flexible Energy Resources / Electrical Engineering,\\
 School of Technology and Innovations, University of Vaasa, Finland\\
-\{tareq.shikdar, hannu.laaksonen\}@uwasa.fi\\
-\small\textsuperscript{*}https://orcid.org/0009-0003-7371-9207}
+\{tareq.shikdar, hannu.laaksonen\}@uwasa.fi}
 
 \begin{document}
 
@@ -46,7 +45,7 @@ The framework~\cite{shikdar2026learning} defines operational failure as the inab
 f_\theta: \mathbf{x}_t \longrightarrow P_{\text{fail}}(t, H)
 \]
 
-where \(\mathbf{x}_t = \{\text{SOH}_t, V_{\text{avg}}, V_{\text{min}}, I_{\text{avg}}, T_{\text{avg}}, \text{duration}, t\}\). After training, isotonic regression calibrates raw probabilities. Model parameters are in Table~\ref{tab:params}.
+where \(\mathbf{x}_t = \{\text{SOH}_t, V_{\text{avg}}, V_{\text{min}}, I_{\text{avg}}, T_{\text{avg}}, \text{duration}, t\}\). After training, isotonic regression calibrates raw probabilities. Model parameters are in Table~\ref{tab:params} and match the original framework~\cite{shikdar2026learning}.
 
 \begin{table}[htbp]
 \centering
@@ -69,7 +68,11 @@ Calibration matters because dispatch decisions use risk thresholds. A well-calib
 
 \subsection{Related Work}
 
-The robustness of learned models under distribution shift is well-studied in general ML, but battery applications remain largely focused on clean-data benchmarks. Recent work on out-of-distribution detection for battery health~\cite{romero2024ood} uses deep embeddings to flag novel operating conditions but stops short of quantifying calibration loss. Domain randomization, popularized in robotics~\cite{tobin2017domain, peng2018sim}, augments training data with perturbed variants to learn invariant representations, but has not been applied to battery hazard models. Our work bridges these lines, showing that the primary vulnerability is in the calibration layer and that minimal intervention---a single-parameter temperature scale or a small operational sample---is sufficient.
+Battery health prognostics has predominantly focused on state-of-health (SOH) estimation and remaining useful life (RUL) prediction using data-driven models. Saha et al.~\cite{saha2009prognostics} established Bayesian frameworks for battery health monitoring, combining relevance vector machines with particle filters to produce probabilistic RUL estimates. Severson et al.~\cite{severson2019data} demonstrated that early-cycle discharge voltage features enable accurate cycle-life classification and prediction for LFP cells, while Roman et al.~\cite{roman2021machine} developed a machine-learning pipeline for capacity-fade estimation across diverse cycling conditions. Attia et al.~\cite{attia2020closed} showed that closed-loop optimization with machine learning can identify fast-charging protocols in high-dimensional parameter spaces. Hu et al.~\cite{hu2020battery} provided a comprehensive review of battery lifetime prognostics, categorizing model-based, data-driven, and hybrid approaches. More recently, Li et al.~\cite{li2019data} surveyed data-driven health estimation methods, identifying feature extraction and transfer learning as open challenges. Song et al.~\cite{song2020lithium} applied XGBoost to SOH estimation with Markov-chain accuracy correction, achieving 10--20\% improvement over standalone ensemble methods. These studies validate models on clean laboratory data but do not characterize performance under operational distribution shift---the gap this paper addresses.
+
+Probability calibration in machine learning is a distinct but related line of work. Platt~\cite{platt1999probabilistic} introduced sigmoid calibration (Platt scaling) for support vector machines, fitting a logistic map between raw scores and posterior probabilities. Zadrozny and Elkan~\cite{zadrozny2001obtaining,zadrozny2002transforming} extended calibration to decision trees and multiclass settings, demonstrating that isotonic regression and binning methods produce well-calibrated probabilities from rank-ordered classifiers. Niculescu-Mizil and Caruana~\cite{niculescu2005predicting} showed that boosted trees and SVMs exhibit characteristic sigmoidal distortion in predicted probabilities and that post-hoc calibration---isotonic regression for large calibration sets, Platt scaling for smaller ones---corrects this distortion. Naeini et al.~\cite{naeini2015obtaining} formalized expected calibration error (ECE) and proposed Bayesian binning. Guo et al.~\cite{guo2017calibration} demonstrated that modern neural networks are poorly calibrated and that temperature scaling, a single-parameter variant of Platt scaling, is surprisingly effective for in-distribution calibration. Ovadia et al.~\cite{ovadia2019can} benchmarked predictive uncertainty under dataset shift, finding that post-hoc calibration that works well in-distribution often fails under distribution shift. These insights motivate our focus on recalibration as a corrective mechanism.
+
+Domain randomization---training on perturbed variants of the data to learn invariant representations---has been successful in robotics~\cite{tobin2017domain,peng2018sim} but has not been applied to battery hazard models. Our work bridges these lines, demonstrating that the primary vulnerability of multihorizon hazard models is in the calibration layer rather than the feature extractor, and that minimal recalibration---a temperature scale or a small operational sample---suffices for field deployment.
 
 \begin{figure}[htbp]
 \centering
@@ -83,6 +86,10 @@ The robustness of learned models under distribution shift is well-studied in gen
 \subsection{Experimental Design}
 
 We evaluate a fixed model (trained on clean data) on perturbed operational data. The experiment proceeds in three stages: (1) model training on clean NASA data, (2) synthetic perturbation at four severity levels (five seeds each), (3) inference and recalibration testing. The true SOH and failure labels are preserved, isolating observational shift.
+
+\subsection{Composite Failure Definition}
+
+A cell is labelled as having failed at the earliest of two events: a voltage sag below 94\% of the early-cycle baseline (averaged over the first 10 cycles per cell) or an SOH drop below 80\%. These thresholds match the original framework~\cite{shikdar2026learning}. For a given horizon \(H\), every cycle whose index satisfies \(\text{cycle} + H \geq \text{fail\_cycle}\) is marked as pre-failure. All thresholds (voltage sag fraction 0.94, SOH threshold 0.80, baseline window 10 cycles) are fixed across all experiments.
 
 \subsection{Model Training}
 
@@ -122,35 +129,36 @@ For each dataset, we measure: raw XGBoost probabilities, calibrated probabilitie
 \centering
 \caption{Clean baseline.}
 \label{tab:clean}
-\begin{tabular}{@{}lccc@{}}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
-Horizon & ECE & AUC & Brier \\
+Horizon & ECE & AUC & Brier & Raw AUC \\
 \midrule
-10 & 0.010 & 0.994 & 0.013 \\
-20 & 0.031 & 0.985 & 0.030 \\
-30 & 0.013 & 0.994 & 0.014 \\
-50 & 0.023 & 0.998 & 0.020 \\
+10 & 0.010 & 0.994 & 0.013 & 0.996 \\
+20 & 0.031 & 0.985 & 0.030 & 0.998 \\
+30 & 0.013 & 0.994 & 0.014 & 0.998 \\
+50 & 0.023 & 0.998 & 0.020 & 0.998 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Calibration Degrades Substantially}
 
-At \(H=20\), ECE jumps from 0.031 to 0.277--0.293---a nine-fold increase---while AUC drops from 0.985 to 0.65--0.74 (Table~\ref{tab:h20}). The degradation saturates at Severity~1: even minimal partial cycling causes near-maximal calibration loss. Temperature scaling---which adjusts only the single logistic slope---fails to correct this at longer horizons (ECE 0.087--0.137), whereas isotonic and Platt regression perform similarly across all horizons. Figure~\ref{fig:ece} shows this saturation across all four horizons, and Figure~\ref{fig:auc} confirms that discrimination degrades more gracefully than calibration.
+At \(H=20\), ECE jumps from 0.031 to 0.277--0.293---a nine-fold increase---while calibrated AUC drops from 0.985 to 0.65--0.74 (Table~\ref{tab:h20}). The raw (uncalibrated) AUC, which measures the base predictor's rank-ordering independently of calibration quality, ranges from 0.72--0.76 under perturbation---higher than the calibrated AUC, confirming that the calibrator's distortion of probability magnitudes is the primary source of performance loss, not the base predictor itself. The degradation saturates at Severity~1: even minimal partial cycling causes near-maximal calibration loss. Temperature scaling---which adjusts only the single logistic slope---fails to correct this at longer horizons (ECE 0.087--0.137), whereas isotonic and Platt regression perform similarly across all horizons. Figure~\ref{fig:ece} shows this saturation across all four horizons, and Figure~\ref{fig:auc} confirms that discrimination degrades more gracefully than calibration.
 
 \begin{table}[htbp]
 \centering
-\caption{Results at \(H=20\).}
+\caption{Results at \(H=20\). Calibrated AUC and Brier are shown; raw (uncalibrated) AUC ranges from 0.72--0.76, confirming that the base predictor retains rank-ordering ability even when probability magnitudes shift.}
 \label{tab:h20}
-\begin{tabular}{@{}lccccc@{}}
+\small
+\begin{tabular}{@{}lcccccc@{}}
 \toprule
-Condition & ECE (raw) & ECE (cal) & ECE (recal) & ECE (Platt) & AUC (cal) \\
+Condition & ECE (raw) & ECE (cal) & ECE (recal) & ECE (Platt) & AUC (cal) & Brier \\
 \midrule
-Clean & --- & 0.031 & --- & --- & 0.985 \\
-S1 (mild) & 0.226$\pm$0.004 & 0.286$\pm$0.010 & 0.068$\pm$0.040 & 0.093$\pm$0.063 & 0.741$\pm$0.009 \\
-S2 (mod.) & 0.212$\pm$0.006 & 0.288$\pm$0.011 & 0.073$\pm$0.022 & 0.077$\pm$0.024 & 0.681$\pm$0.004 \\
-S3 (sev.) & 0.204$\pm$0.005 & 0.277$\pm$0.010 & 0.060$\pm$0.027 & 0.088$\pm$0.032 & 0.674$\pm$0.006 \\
-S4 (aggr.) & 0.220$\pm$0.004 & 0.293$\pm$0.014 & 0.068$\pm$0.025 & 0.076$\pm$0.026 & 0.652$\pm$0.005 \\
+Clean & --- & 0.031 & --- & --- & 0.985 & 0.030 \\
+S1 (mild) & 0.226$\pm$0.004 & 0.286$\pm$0.010 & 0.068$\pm$0.040 & 0.093$\pm$0.063 & 0.741$\pm$0.009 & 0.306$\pm$0.003 \\
+S2 (mod.) & 0.212$\pm$0.006 & 0.288$\pm$0.011 & 0.073$\pm$0.022 & 0.077$\pm$0.024 & 0.681$\pm$0.004 & 0.309$\pm$0.004 \\
+S3 (sev.) & 0.204$\pm$0.005 & 0.277$\pm$0.010 & 0.060$\pm$0.027 & 0.088$\pm$0.032 & 0.674$\pm$0.006 & 0.307$\pm$0.001 \\
+S4 (aggr.) & 0.220$\pm$0.004 & 0.293$\pm$0.014 & 0.068$\pm$0.025 & 0.076$\pm$0.026 & 0.652$\pm$0.005 & 0.313$\pm$0.003 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -177,15 +185,16 @@ The pattern holds across all horizons (Tables~\ref{tab:h10}--\ref{tab:h50}). Lon
 \centering
 \caption{Results at \(H=10\).}
 \label{tab:h10}
-\begin{tabular}{@{}lccccc@{}}
+\small
+\begin{tabular}{@{}lcccccc@{}}
 \toprule
-Condition & ECE (raw) & ECE (cal) & ECE (recal) & ECE (Platt) & AUC (cal) \\
+Condition & ECE (raw) & ECE (cal) & ECE (recal) & ECE (Platt) & AUC (cal) & Brier \\
 \midrule
-Clean & --- & 0.010 & --- & --- & 0.994 \\
-S1 & 0.242$\pm$0.012 & 0.272$\pm$0.009 & 0.057$\pm$0.028 & 0.077$\pm$0.006 & 0.694$\pm$0.025 \\
-S2 & 0.274$\pm$0.009 & 0.302$\pm$0.005 & 0.065$\pm$0.014 & 0.063$\pm$0.008 & 0.657$\pm$0.012 \\
-S3 & 0.270$\pm$0.010 & 0.300$\pm$0.006 & 0.071$\pm$0.022 & 0.062$\pm$0.013 & 0.674$\pm$0.007 \\
-S4 & 0.283$\pm$0.008 & 0.313$\pm$0.004 & 0.076$\pm$0.024 & 0.054$\pm$0.013 & 0.626$\pm$0.017 \\
+Clean & --- & 0.010 & --- & --- & 0.994 & 0.013 \\
+S1 & 0.242$\pm$0.012 & 0.272$\pm$0.009 & 0.057$\pm$0.028 & 0.077$\pm$0.006 & 0.694$\pm$0.025 & 0.284$\pm$0.005 \\
+S2 & 0.274$\pm$0.009 & 0.302$\pm$0.005 & 0.065$\pm$0.014 & 0.063$\pm$0.008 & 0.657$\pm$0.012 & 0.303$\pm$0.004 \\
+S3 & 0.270$\pm$0.010 & 0.300$\pm$0.006 & 0.071$\pm$0.022 & 0.062$\pm$0.013 & 0.674$\pm$0.007 & 0.299$\pm$0.002 \\
+S4 & 0.283$\pm$0.008 & 0.313$\pm$0.004 & 0.076$\pm$0.024 & 0.054$\pm$0.013 & 0.626$\pm$0.017 & 0.312$\pm$0.003 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -194,15 +203,16 @@ S4 & 0.283$\pm$0.008 & 0.313$\pm$0.004 & 0.076$\pm$0.024 & 0.054$\pm$0.013 & 0.6
 \centering
 \caption{Results at \(H=30\).}
 \label{tab:h30}
-\begin{tabular}{@{}lccccc@{}}
+\small
+\begin{tabular}{@{}lcccccc@{}}
 \toprule
-Condition & ECE (raw) & ECE (cal) & ECE (recal) & ECE (Platt) & AUC (cal) \\
+Condition & ECE (raw) & ECE (cal) & ECE (recal) & ECE (Platt) & AUC (cal) & Brier \\
 \midrule
-Clean & --- & 0.013 & --- & --- & 0.994 \\
-S1 & 0.233$\pm$0.004 & 0.288$\pm$0.009 & 0.092$\pm$0.023 & 0.094$\pm$0.054 & 0.752$\pm$0.003 \\
-S2 & 0.235$\pm$0.010 & 0.298$\pm$0.011 & 0.077$\pm$0.019 & 0.079$\pm$0.031 & 0.706$\pm$0.004 \\
-S3 & 0.227$\pm$0.011 & 0.294$\pm$0.011 & 0.076$\pm$0.025 & 0.073$\pm$0.034 & 0.688$\pm$0.001 \\
-S4 & 0.265$\pm$0.010 & 0.316$\pm$0.005 & 0.078$\pm$0.030 & 0.070$\pm$0.027 & 0.678$\pm$0.008 \\
+Clean & --- & 0.013 & --- & --- & 0.994 & 0.014 \\
+S1 & 0.233$\pm$0.004 & 0.288$\pm$0.009 & 0.092$\pm$0.023 & 0.094$\pm$0.054 & 0.752$\pm$0.003 & 0.317$\pm$0.002 \\
+S2 & 0.235$\pm$0.010 & 0.298$\pm$0.011 & 0.077$\pm$0.019 & 0.079$\pm$0.031 & 0.706$\pm$0.004 & 0.324$\pm$0.001 \\
+S3 & 0.227$\pm$0.011 & 0.294$\pm$0.011 & 0.076$\pm$0.025 & 0.073$\pm$0.034 & 0.688$\pm$0.001 & 0.321$\pm$0.001 \\
+S4 & 0.265$\pm$0.010 & 0.316$\pm$0.005 & 0.078$\pm$0.030 & 0.070$\pm$0.027 & 0.678$\pm$0.008 & 0.332$\pm$0.001 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -211,22 +221,23 @@ S4 & 0.265$\pm$0.010 & 0.316$\pm$0.005 & 0.078$\pm$0.030 & 0.070$\pm$0.027 & 0.6
 \centering
 \caption{Results at \(H=50\).}
 \label{tab:h50}
-\begin{tabular}{@{}lccccc@{}}
+\small
+\begin{tabular}{@{}lcccccc@{}}
 \toprule
-Condition & ECE (raw) & ECE (cal) & ECE (recal) & ECE (Platt) & AUC (cal) \\
+Condition & ECE (raw) & ECE (cal) & ECE (recal) & ECE (Platt) & AUC (cal) & Brier \\
 \midrule
-Clean & --- & 0.023 & --- & --- & 0.998 \\
-S1 & 0.320$\pm$0.016 & 0.331$\pm$0.011 & 0.094$\pm$0.028 & 0.069$\pm$0.032 & 0.757$\pm$0.005 \\
-S2 & 0.343$\pm$0.018 & 0.366$\pm$0.013 & 0.084$\pm$0.024 & 0.070$\pm$0.038 & 0.742$\pm$0.002 \\
-S3 & 0.343$\pm$0.018 & 0.370$\pm$0.013 & 0.080$\pm$0.027 & 0.086$\pm$0.051 & 0.722$\pm$0.003 \\
-S4 & 0.359$\pm$0.017 & 0.381$\pm$0.012 & 0.088$\pm$0.037 & 0.080$\pm$0.026 & 0.731$\pm$0.005 \\
+Clean & --- & 0.023 & --- & --- & 0.998 & 0.020 \\
+S1 & 0.320$\pm$0.016 & 0.331$\pm$0.011 & 0.094$\pm$0.028 & 0.069$\pm$0.032 & 0.757$\pm$0.005 & 0.336$\pm$0.004 \\
+S2 & 0.343$\pm$0.018 & 0.366$\pm$0.013 & 0.084$\pm$0.024 & 0.070$\pm$0.038 & 0.742$\pm$0.002 & 0.365$\pm$0.006 \\
+S3 & 0.343$\pm$0.018 & 0.370$\pm$0.013 & 0.080$\pm$0.027 & 0.086$\pm$0.051 & 0.722$\pm$0.003 & 0.368$\pm$0.007 \\
+S4 & 0.359$\pm$0.017 & 0.381$\pm$0.012 & 0.088$\pm$0.037 & 0.080$\pm$0.026 & 0.731$\pm$0.005 & 0.378$\pm$0.006 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Recalibration Recovery}\label{sec:recal}
 
-Recalibrating isotonic regression on a 10\% sample of perturbed data recovers calibration across all conditions (Table~\ref{tab:recal_summary}). ECE drops to 0.06--0.09---a 71--88\% reduction (evaluated on held-out data). The recovery is consistent regardless of severity or horizon, as summarised in Figure~\ref{fig:combined}.
+Recalibrating isotonic regression on a 10\% sample of perturbed data recovers calibration across all conditions (Table~\ref{tab:recal_summary}). ECE drops to 0.06--0.09---a 71--88\% reduction (evaluated on held-out data, per-severity range). The recovery is consistent regardless of severity or horizon, as summarised in Figure~\ref{fig:combined}.
 
 We also evaluate Platt (sigmoid) scaling and temperature scaling as alternatives to isotonic regression. Platt and isotonic are indistinguishable across all horizons (ECE 0.06--0.09). Temperature scaling matches them at \(H=10\)--20 (ECE 0.074--0.086) but underperforms at \(H=30\) (0.113~vs.\ 0.081 for isotonic) and \(H=50\) (0.159~vs.\ 0.086). The single-parameter logit transformation has insufficient capacity when the raw probability distribution is heavily shifted. This confirms that recalibration itself matters, but the calibrator must have sufficient flexibility---isotonic or Platt is recommended for longer horizons.
 
@@ -272,7 +283,7 @@ Domain randomization provides a modest additional improvement on top of recalibr
 
 \subsection{Root Cause: Feature Shift}
 
-The primary driver of calibration degradation is the shift in minimum voltage. In full discharge, \(V_{\text{min}}\) reaches approximately 2.3~V. At 75\% DoD truncation (Severity~1), it rises to approximately 3.2~V---a 39\% increase (Figure~\ref{fig:dist}). The shift saturates at Severity~1, mirroring the ECE saturation pattern: higher severities produce little additional feature shift. The XGBoost model learned split thresholds on clean feature ranges, and the isotonic calibrator cannot adapt to the shifted raw probability distribution.
+The primary driver of calibration degradation is the shift in minimum voltage. In full discharge, \(V_{\text{min}}\) reaches approximately 2.3~V. At 75\% DoD truncation (Severity~1, seed~42), it rises to approximately 3.2~V---a 39\% increase (Figure~\ref{fig:dist}). The shift magnitude varies somewhat across seeds due to the random DoD sampling, but the saturation pattern---near-maximal shift at Severity~1 with little additional change at higher severities---is consistent. The shift saturates at Severity~1, mirroring the ECE saturation pattern: higher severities produce little additional feature shift. The XGBoost model learned split thresholds on clean feature ranges, and the isotonic calibrator cannot adapt to the shifted raw probability distribution.
 
 \begin{figure}[htbp]
 \centering
@@ -327,7 +338,7 @@ This requires no base classifier retraining, no original training data, and no a
 
 \subsection{Limitations}
 
-Six limitations should be noted. First, we preserve the true SOH trajectory, isolating observational shift but not capturing coupled degradation dynamics. Second, results are for LCO chemistry only; validation across LFP, NMC, and other chemistries is needed. Third, the Gaussian temperature noise model does not capture systematic thermal gradients or diurnal variation. Fourth, only XGBoost is tested; other architectures may differ. Fifth, the sample-size sweep (Figure~\ref{fig:sweep}) tests only the isotonic calibrator; Platt scaling may respond differently to sample size. Sixth, while our perturbation model captures the effects of partial cycling, temperature noise, and rest irregularity, it does not simulate real-time load-following profiles, current pulses above 1C, or multi-cell thermal interactions---all of which are present in utility-scale BESS deployments. The perturbation model is designed for controlled degradation experiments, not as a digital twin of field operation.
+Eight limitations should be noted. First, we preserve the true SOH trajectory, isolating observational shift but not capturing coupled degradation dynamics. Second, results are for LCO chemistry only; validation across LFP, NMC, and other chemistries is needed. Third, the Gaussian temperature noise model does not capture systematic thermal gradients or diurnal variation. Fourth, only XGBoost is tested; other architectures may differ. Fifth, the sample-size sweep (Figure~\ref{fig:sweep}) tests only the isotonic calibrator; Platt scaling may respond differently to sample size. Sixth, while our perturbation model captures the effects of partial cycling, temperature noise, and rest irregularity, it does not simulate real-time load-following profiles, current pulses above 1C, or multi-cell thermal interactions---all of which are present in utility-scale BESS deployments. The perturbation model is designed for controlled degradation experiments, not as a digital twin of field operation. Seventh, the SHAP analysis (Figure~\ref{fig:shap}) is presented only for \(H=20\) at Severity~1; the root cause conclusion that \(V_{\text{min}}\) is the dominant feature may not generalize identically to all horizons and severity levels. Eighth, the \(V_{\text{min}}\) shift magnitudes (2.3~V to 3.2~V) are reported for a single perturbation seed (42) due to the computational cost of computing SHAP values across multiple seeds; while the saturation pattern is stable, exact shift values vary with DoD randomization.
 
 \subsection{Compute Cost}
 
@@ -339,23 +350,71 @@ This paper presents the first systematic robustness evaluation of multihorizon b
 
 \begin{enumerate}
 \item Calibration degrades substantially under any level of partial cycling. ECE increases from 0.01--0.03 to 0.27--0.38, saturating at the mildest perturbation.
-\item Discrimination degrades moderately (AUC 0.99--1.00 to 0.63--0.76). The feature extractor generalizes better than the calibrator.
+ \item Discrimination degrades moderately (calibrated AUC 0.99--1.00 to 0.61--0.77; raw AUC 0.72--0.76). The feature extractor generalizes better than the calibrator.
  \item Recalibration on a 10\% operational sample (held-out evaluation) recovers 71--88\% of the calibration gap (ECE 0.06--0.09), providing a practical path to field deployment.
 \end{enumerate}
 
 Multihorizon hazard models are not inherently robust to observational distribution shift, but a lightweight recalibration strategy suffices to maintain reliability in the field.
 
-\begin{thebibliography}{5}
+\begin{thebibliography}{19}
+
 \bibitem{shikdar2026learning}
 T.~A.~Shikdar and H.~Laaksonen, ``Learning when not to use a battery: Multihorizon failure intelligence,'' \textit{International Transactions on Electrical Energy Systems}, vol.~2026, p.~6000810, 2026.
+
 \bibitem{nasa2010battery}
 B.~Saha and K.~Goebel, ``Battery data set,'' NASA Ames Prognostics Data Repository, 2007.
-\bibitem{romero2024ood}
-A.~Romero et al., ``Out-of-distribution detection for battery health monitoring,'' \textit{Journal of Power Sources}, vol.~591, p.~233878, 2024.
+
 \bibitem{tobin2017domain}
-J.~Tobin et al., ``Domain randomization for transferring deep neural networks from simulation to the real world,'' in \textit{Proc.~IEEE/RSJ IROS}, 2017, pp.~23--30.
+J.~Tobin, R.~Fong, A.~Ray, J.~Schneider, W.~Zaremba, and P.~Abbeel, ``Domain randomization for transferring deep neural networks from simulation to the real world,'' in \textit{Proc.~IEEE/RSJ IROS}, 2017, pp.~23--30.
+
 \bibitem{peng2018sim}
-X.~B.~Peng et al., ``Sim-to-real transfer of robotic control with dynamics randomization,'' in \textit{Proc.~IEEE ICRA}, 2018, pp.~3803--3810.
+X.~B.~Peng, M.~Andrychowicz, W.~Zaremba, and P.~Abbeel, ``Sim-to-real transfer of robotic control with dynamics randomization,'' in \textit{Proc.~IEEE ICRA}, 2018, pp.~3803--3810.
+
+\bibitem{saha2009prognostics}
+B.~Saha, K.~Goebel, S.~Poll, and J.~Christophersen, ``Prognostics methods for battery health monitoring: A Bayesian approach,'' \textit{IEEE Trans.~Instrum.~Meas.}, vol.~58, no.~2, pp.~291--296, 2009.
+
+\bibitem{severson2019data}
+K.~A.~Severson, P.~M.~Attia, N.~Jin, N.~Perkins, B.~Jiang, Z.~Yang, M.~H.~Chen, M.~Aykol, P.~K.~Herring, D.~Frajndlich, M.~Z.~Bazant, S.~J.~Harris, W.~C.~Chueh, and R.~D.~Braatz, ``Data-driven prediction of battery cycle life before capacity degradation,'' \textit{Nature Energy}, vol.~4, pp.~383--391, 2019.
+
+\bibitem{song2020lithium}
+Y.~Song, D.~Liu, C.~Hou, and H.~Peng, ``Lithium-ion battery SOH estimation based on XGBoost with Markov-chain correction,'' \textit{Energies}, vol.~13, no.~4, p.~812, 2020.
+
+\bibitem{roman2021machine}
+D.~Roman, S.~Saxena, V.~Viswanathan, and V.~Sundararaghavan, ``Machine learning pipeline for battery state-of-health estimation,'' \textit{Nature Machine Intelligence}, vol.~3, pp.~447--457, 2021.
+
+\bibitem{chen2016xgboost}
+T.~Chen and C.~Guestrin, ``XGBoost: A scalable tree boosting system,'' in \textit{Proc.~22nd ACM SIGKDD}, 2016, pp.~785--794.
+
+\bibitem{guo2017calibration}
+C.~Guo, G.~Pleiss, Y.~Sun, and K.~Q.~Weinberger, ``On calibration of modern neural networks,'' in \textit{Proc.~34th ICML}, 2017, pp.~1321--1330.
+
+\bibitem{niculescu2005predicting}
+A.~Niculescu-Mizil and R.~Caruana, ``Predicting good probabilities with supervised learning,'' in \textit{Proc.~22nd ICML}, 2005, pp.~625--632.
+
+\bibitem{naeini2015obtaining}
+M.~P.~Naeini, G.~F.~Cooper, and M.~Hauskrecht, ``Obtaining well calibrated probabilities using Bayesian binning,'' in \textit{Proc.~29th AAAI}, 2015, pp.~2901--2907.
+
+\bibitem{platt1999probabilistic}
+J.~C.~Platt, ``Probabilistic outputs for support vector machines,'' in \textit{Advances in Large Margin Classifiers}, 1999, pp.~61--74.
+
+\bibitem{zadrozny2001obtaining}
+B.~Zadrozny and C.~Elkan, ``Obtaining calibrated probability estimates from decision trees and naive Bayesian classifiers,'' in \textit{Proc.~18th ICML}, 2001, pp.~609--616.
+
+\bibitem{zadrozny2002transforming}
+B.~Zadrozny and C.~Elkan, ``Transforming classifier scores into accurate multiclass probability estimates,'' in \textit{Proc.~8th ACM SIGKDD}, 2002, pp.~694--699.
+
+\bibitem{ovadia2019can}
+Y.~Ovadia, E.~Fertig, J.~Ren, Z.~Nado, D.~Sculley, S.~Nowozin, J.~Dillon, B.~Lakshminarayanan, and J.~Snoek, ``Can you trust your model's uncertainty? Evaluating predictive uncertainty under dataset shift,'' in \textit{Proc.~33rd NeurIPS}, 2019, pp.~14003--14014.
+
+\bibitem{attia2020closed}
+P.~M.~Attia, A.~Grover, N.~Jin, K.~A.~Severson, T.~M.~Markov, Y.-H.~Liao, M.~H.~Chen, B.~Cheong, N.~Perkins, Z.~Yang, P.~K.~Herring, M.~Aykol, S.~J.~Harris, R.~D.~Braatz, S.~Ermon, and W.~C.~Chueh, ``Closed-loop optimization of fast-charging protocols for batteries with machine learning,'' \textit{Nature}, vol.~578, pp.~397--402, 2020.
+
+\bibitem{hu2020battery}
+X.~Hu, L.~Xu, X.~Lin, and M.~Pecht, ``Battery lifetime prognostics,'' \textit{Joule}, vol.~4, no.~2, pp.~310--346, 2020.
+
+\bibitem{li2019data}
+Y.~Li, K.~Liu, A.~M.~Foley, A.~Zülke, M.~Berecibar, E.~Nanini-Maury, J.~Van Mierlo, and H.~E.~Hoster, ``Data-driven health estimation and lifetime prediction of lithium-ion batteries: A review,'' \textit{Renewable and Sustainable Energy Reviews}, vol.~113, p.~109254, 2019.
+
 \end{thebibliography}
 
 \end{document}

@@ -62,7 +62,8 @@ for H in [10, 20, 30, 50]:
             "Clean ECE": f"{_clean_ece(H):.3f}",
             "Perturbed": f"{ss.ece_cal.mean():.3f}$\\pm${ss.ece_cal.std():.3f}",
             "Recal (iso)": f"{ss.ece_recal.mean():.3f}$\\pm${ss.ece_recal.std():.3f}",
-            "Recal (Platt)": f"{ss.ece_recal_platt.mean():.3f}$\\pm${ss.ece_recal_platt.std():.3f}"})
+            "Recal (Platt)": f"{ss.ece_recal_platt.mean():.3f}$\\pm${ss.ece_recal_platt.std():.3f}",
+            "Recal (Temp)": f"{ss.ece_recal_temp.mean():.3f}$\\pm${ss.ece_recal_temp.std():.3f}"})
 t3 = pd.DataFrame(rows3)
 t3.to_csv(os.path.join(TABLES, "Table3_Recalibration_Recovery.csv"), index=False)
 
