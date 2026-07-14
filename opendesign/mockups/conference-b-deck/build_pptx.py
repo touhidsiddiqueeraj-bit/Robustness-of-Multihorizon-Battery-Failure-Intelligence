@@ -243,8 +243,8 @@ add_bg(slide, CREAM)
 add_gold_bar(slide)
 add_label(slide, Inches(0.8), Inches(0.4), Inches(4), "EVIDENCE")
 add_text_box(slide, Inches(0.8), Inches(0.7), Inches(10), Inches(0.6), "SHAP confirms Vmin dominance", font_size=36, color=NAVY, bold=True)
-add_figure(slide, os.path.join(fig_dir, "fig_shap.png"), Inches(1.5), Inches(1.3), Inches(10.3))
-add_text_box(slide, Inches(1.5), Inches(6.8), Inches(10), Inches(0.4), "Vmin is the dominant feature under both clean and perturbed regimes. Under perturbation, every feature distribution shifts, breaking the calibrator.", font_size=14, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
+add_figure(slide, os.path.join(fig_dir, "fig_shap.png"), Inches(1.5), Inches(1.3), Inches(10.0))
+add_text_box(slide, Inches(1.5), Inches(5.8), Inches(10), Inches(0.8), "Vmin is the dominant feature under both clean and perturbed regimes. Under perturbation, every feature distribution shifts, breaking the calibrator.", font_size=14, color=TEXT_MUTED, alignment=PP_ALIGN.CENTER)
 add_slide_number(slide, 7)
 
 # ═══════════════════════════════════════════════
@@ -276,8 +276,8 @@ slide = prs.slides.add_slide(prs.slide_layouts[6])
 add_bg(slide, CREAM)
 add_gold_bar(slide)
 add_label(slide, Inches(0.8), Inches(0.4), Inches(4), "EVIDENCE")
-add_text_box(slide, Inches(0.8), Inches(0.7), Inches(8), Inches(0.6), "Recalibration: held-out evaluation", font_size=36, color=NAVY, bold=True)
-add_text_box(slide, Inches(0.8), Inches(1.0), Inches(5.2), Inches(0.5), "Both isotonic and Platt recalibration recover calibration. Mean±std across 5 seeds × 4 severities:", font_size=15, color=TEXT)
+add_text_box(slide, Inches(0.8), Inches(0.7), Inches(8), Inches(0.5), "Recalibration: held-out evaluation", font_size=36, color=NAVY, bold=True)
+add_text_box(slide, Inches(0.8), Inches(1.3), Inches(5.2), Inches(0.4), "Both isotonic and Platt recalibration recover calibration. Mean±std across 5 seeds × 4 severities:", font_size=15, color=TEXT)
 tbl2_data = [
     ["Horizon", "Clean ECE", "Perturbed", "Isotonic", "Platt"],
     ["H=10", "0.010", "0.297±0.017", "0.067±0.022", "0.064±0.013"],
@@ -286,7 +286,7 @@ tbl2_data = [
     ["H=50", "0.023", "0.362±0.022", "0.086±0.028", "0.076±0.036"],
 ]
 rows2, cols2 = 5, 5
-table2_shape = slide.shapes.add_table(rows2, cols2, Emu(Inches(0.8)), Emu(Inches(1.7)), Emu(Inches(6.2)), Emu(Inches(2.5)))
+table2_shape = slide.shapes.add_table(rows2, cols2, Emu(Inches(0.8)), Emu(Inches(1.9)), Emu(Inches(6.2)), Emu(Inches(2.5)))
 table2 = table2_shape.table
 for r in range(rows2):
     for c in range(cols2):
