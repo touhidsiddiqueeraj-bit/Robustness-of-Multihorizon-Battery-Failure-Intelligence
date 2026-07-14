@@ -34,7 +34,7 @@ Battery energy storage systems (BESSs) are dispatched for flexibility services i
 
 But the model was trained exclusively on clean laboratory data---full cycles at fixed C-rates, consistent rest periods, controlled temperatures. Real BESS operation involves partial cycles at varying depths of discharge (DoD), irregular loads, random rest periods, and temperature fluctuations. The calibration quality under these conditions is unknown, and no operator can trust a model whose reliability degrades in uncharacterized ways.
 
-\textbf{Practical takeaway for operators.} Deploying a lab-trained hazard model directly into field operation risks systematically overconfident failure probabilities---the calibration error jumps from near-zero to 0.27--0.38 under partial cycling (Section~\ref{sec:results}). However, the fix does not require retraining the base model. An operator need only collect 50--100 operational cycles, extract the same per-cycle features, run the frozen model, and fit a new calibrator (isotonic or Platt) on the resulting raw probabilities. This recalibration step recovers 71--88\% of the calibration gap (ECE drops to 0.06--0.09), and evidence suggests the particular calibrator choice (isotonic, Platt, or temperature scaling) does not matter at short horizons (Section~\ref{sec:recal}). Temperature scaling alone---a single-parameter logistic adjustment---is sufficient for horizons up to 30 cycles, making field recalibration nearly trivial.
+\textbf{Practical takeaway for operators.} Deploying a lab-trained hazard model directly into field operation risks systematically overconfident failure probabilities---the calibration error jumps from near-zero to 0.27--0.38 under partial cycling (Section~\ref{sec:results}). However, the fix does not require retraining the base model. An operator need only collect 50--100 operational cycles, extract the same per-cycle features, run the frozen model, and fit a new calibrator (isotonic or Platt) on the resulting raw probabilities. This recalibration step recovers 71--88\% of the calibration gap (ECE drops to 0.06--0.09), and isotonic and Platt perform equivalently across all horizons (Section~\ref{sec:recal}). Temperature scaling---a single-parameter logistic adjustment---is only competitive at the shortest horizons (H $\leq$ 20); isotonic or Platt is recommended for longer prediction windows.
 
 This paper tests whether calibration survives realistic conditions. We generate perturbed operational data from existing lab cycling data, measure calibration degradation across four severity levels and four prediction horizons, and test whether lightweight recalibration can restore trustworthiness. The true SOH trajectory is preserved throughout, isolating the effect of observational distribution shift from changed degradation dynamics.
 
@@ -228,7 +228,7 @@ S4 & 0.359$\pm$0.017 & 0.381$\pm$0.012 & 0.088$\pm$0.037 & 0.080$\pm$0.026 & 0.7
 
 Recalibrating isotonic regression on a 10\% sample of perturbed data recovers calibration across all conditions (Table~\ref{tab:recal_summary}). ECE drops to 0.06--0.09---a 71--88\% reduction (evaluated on held-out data). The recovery is consistent regardless of severity or horizon, as summarised in Figure~\ref{fig:combined}.
 
-We also evaluate Platt (sigmoid) scaling and temperature scaling as alternatives to isotonic regression. The results are near-identical at short horizons: Platt achieves ECE of 0.06--0.08 and temperature scaling achieves 0.07--0.09 (Table~\ref{tab:recal_summary}), overlapping with isotonic at \(H=10\)--30. At \(H=50\), however, temperature scaling underperforms (ECE 0.137~vs.\ 0.087 for isotonic), suggesting that the single-parameter logit transformation is insufficient when the raw probability distribution is heavily shifted. Platt and isotonic remain indistinguishable across all horizons. This confirms that recalibration itself matters, not the particular functional form---provided the calibrator has sufficient capacity.
+We also evaluate Platt (sigmoid) scaling and temperature scaling as alternatives to isotonic regression. Platt and isotonic are indistinguishable across all horizons (ECE 0.06--0.09). Temperature scaling matches them at \(H=10\)--20 (ECE 0.074--0.086) but underperforms at \(H=30\) (0.113~vs.\ 0.081 for isotonic) and \(H=50\) (0.159~vs.\ 0.086). The single-parameter logit transformation has insufficient capacity when the raw probability distribution is heavily shifted. This confirms that recalibration itself matters, but the calibrator must have sufficient flexibility---isotonic or Platt is recommended for longer horizons.
 
 \begin{table}[htbp]
 \centering
@@ -238,10 +238,10 @@ We also evaluate Platt (sigmoid) scaling and temperature scaling as alternatives
 \toprule
 Horizon & Clean ECE & Perturbed & Isotonic & Platt & Temperature \\
 \midrule
-10 & 0.010 & 0.297$\pm$0.017 & 0.067$\pm$0.022 & 0.064$\pm$0.013 & 0.066$\pm$0.024 \\
-20 & 0.031 & 0.286$\pm$0.012 & 0.067$\pm$0.027 & 0.083$\pm$0.037 & 0.087$\pm$0.022 \\
-30 & 0.013 & 0.299$\pm$0.014 & 0.081$\pm$0.024 & 0.079$\pm$0.036 & 0.104$\pm$0.019 \\
-50 & 0.023 & 0.362$\pm$0.022 & 0.086$\pm$0.028 & 0.076$\pm$0.036 & 0.137$\pm$0.026 \\
+10 & 0.010 & 0.297$\pm$0.017 & 0.067$\pm$0.022 & 0.064$\pm$0.013 & 0.074$\pm$0.020 \\
+20 & 0.031 & 0.286$\pm$0.012 & 0.067$\pm$0.027 & 0.083$\pm$0.037 & 0.086$\pm$0.023 \\
+30 & 0.013 & 0.299$\pm$0.014 & 0.081$\pm$0.024 & 0.079$\pm$0.036 & 0.113$\pm$0.027 \\
+50 & 0.023 & 0.362$\pm$0.022 & 0.086$\pm$0.028 & 0.076$\pm$0.036 & 0.159$\pm$0.021 \\
 \bottomrule
 \end{tabular}
 \end{table}

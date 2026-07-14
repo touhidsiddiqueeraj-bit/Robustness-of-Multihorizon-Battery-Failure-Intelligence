@@ -286,10 +286,10 @@ add_text_box(slide, Inches(0.8), Inches(0.6), Inches(8), Inches(0.7), "Recalibra
 add_text_box(slide, Inches(0.8), Inches(1.6), Inches(5.2), Inches(0.5), "All three recalibration methods recover calibration on held-out data. Mean±std across 5 seeds × 4 severities:", font_size=15, color=TEXT)
 tbl2_data = [
     ["Horizon", "Clean ECE", "Perturbed", "Isotonic", "Platt", "Temp."],
-    ["H=10", "0.010", "0.297±0.017", "0.067±0.022", "0.064±0.013", "0.066±0.024"],
-    ["H=20", "0.031", "0.286±0.012", "0.067±0.027", "0.083±0.037", "0.087±0.022"],
-    ["H=30", "0.013", "0.299±0.014", "0.081±0.024", "0.079±0.036", "0.104±0.019"],
-    ["H=50", "0.023", "0.362±0.022", "0.086±0.028", "0.076±0.036", "0.137±0.026"],
+    ["H=10", "0.010", "0.297±0.017", "0.067±0.022", "0.064±0.013", "0.074±0.020"],
+    ["H=20", "0.031", "0.286±0.012", "0.067±0.027", "0.083±0.037", "0.086±0.023"],
+    ["H=30", "0.013", "0.299±0.014", "0.081±0.024", "0.079±0.036", "0.113±0.027"],
+    ["H=50", "0.023", "0.362±0.022", "0.086±0.028", "0.076±0.036", "0.159±0.021"],
 ]
 rows2, cols2 = 5, 6
 table2_shape = slide.shapes.add_table(rows2, cols2, Emu(Inches(0.8)), Emu(Inches(1.9)), Emu(Inches(7.2)), Emu(Inches(2.5)))
@@ -309,7 +309,7 @@ for r in range(rows2):
                 paragraph.font.color.rgb = SUCCESS
             else:
                 paragraph.font.color.rgb = TEXT
-add_text_box(slide, Inches(0.8), Inches(4.5), Inches(7.0), Inches(0.3), "All three methods comparable at H=10–30; temperature scaling underperforms at H=50", font_size=13, color=TEXT_MUTED)
+add_text_box(slide, Inches(0.8), Inches(4.5), Inches(7.0), Inches(0.3), "Isotonic and Platt comparable at all horizons; temperature scaling underperforms at H=30+", font_size=13, color=TEXT_MUTED)
 add_figure(slide, os.path.join(fig_dir, "fig_combined.png"), Inches(7.5), Inches(1.0), Inches(5.0))
 add_slide_number(slide, 10)
 

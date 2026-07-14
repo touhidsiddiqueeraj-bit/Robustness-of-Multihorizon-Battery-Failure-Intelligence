@@ -119,9 +119,9 @@ def main():
                     p_safe = np.clip(p_raw, eps, 1 - eps)
                     logits = np.log(p_safe / (1 - p_safe))
                     def nll(T):
-                        p = 1 / (1 + np.exp(-logits / T))
+                        p = 1 / (1 + np.exp(-logits[mask] / T))
                         p = np.clip(p, eps, 1 - eps)
-                        return -np.mean(y * np.log(p) + (1 - y) * np.log(1 - p))
+                        return -np.mean(y[mask] * np.log(p) + (1 - y[mask]) * np.log(1 - p))
                     res = minimize(nll, x0=1.0, method='L-BFGS-B', bounds=[(1e-3, 10.0)])
                     T_opt = res.x[0]
                     p_temp = 1 / (1 + np.exp(-logits / T_opt))
