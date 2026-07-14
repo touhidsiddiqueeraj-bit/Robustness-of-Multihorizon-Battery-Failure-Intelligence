@@ -22,6 +22,7 @@ os.makedirs(FIGS_DIR, exist_ok=True)
 FEATURES = ["cycle", "avg_voltage", "min_voltage", "avg_current", "avg_temp", "duration", "SOH"]
 H_LIST = [10, 20, 30, 50]
 SEEDS = [42, 123, 456, 789, 101112]
+SEED_COLORS = plt.cm.Set2(np.linspace(0.05, 0.95, len(SEEDS)))
 PRIMARY_H = 20
 N_BINS = 10
 
@@ -75,7 +76,7 @@ def main():
         all_mpv = []
         seed_data = res_h[res_h.severity == severity]
 
-        for seed_val in SEEDS:
+        for i, seed_val in enumerate(SEEDS):
             syn_path = os.path.join(DATA_DIR, "synthetic", f"nasa_perturbed_s{severity}_s{seed_val}.csv")
             df = pd.read_csv(syn_path)
             df = df.sort_values(["cell", "cycle"]).reset_index(drop=True)
@@ -88,7 +89,8 @@ def main():
             all_fp.append(fp)
             all_mpv.append(mpv)
 
-            ax.plot(fp, mpv, color="steelblue", alpha=0.2, linewidth=0.8)
+            label = f"Seed {seed_val}" if idx == 0 else "_nolegend_"
+            ax.plot(fp, mpv, color=SEED_COLORS[i], alpha=0.5, linewidth=0.8, label=label)
 
         # Mean across seeds
         max_len = max(len(f) for f in all_fp)
@@ -189,7 +191,7 @@ def main():
     # Panel A: Reliability diagram for severity 3 (exemplary)
     ax = fig.add_subplot(gs[0, 0])
     all_fp, all_mpv = [], []
-    for seed_val in SEEDS:
+    for i, seed_val in enumerate(SEEDS):
         syn_path = os.path.join(DATA_DIR, "synthetic", f"nasa_perturbed_s3_s{seed_val}.csv")
         df = pd.read_csv(syn_path)
         df = df.sort_values(["cell", "cycle"]).reset_index(drop=True)
@@ -200,7 +202,7 @@ def main():
         fp, mpv = calibration_curve(y_clean, p_cal, n_bins=N_BINS, strategy="uniform")
         all_fp.append(fp)
         all_mpv.append(mpv)
-        ax.plot(fp, mpv, color="steelblue", alpha=0.2, linewidth=0.8)
+        ax.plot(fp, mpv, color=SEED_COLORS[i], alpha=0.5, linewidth=0.8, label=f"Seed {seed_val}")
     max_len = max(len(f) for f in all_fp)
     fp_interp = np.linspace(0, 1, max_len)
     mpv_interp = np.zeros(max_len)
