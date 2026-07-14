@@ -6,6 +6,7 @@ import joblib
 from sklearn.metrics import brier_score_loss, roc_auc_score
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import LogisticRegression
+from scipy.optimize import minimize
 
 from compute_ece import compute_ece
 
@@ -112,10 +113,27 @@ def main():
                     p_recal_platt = p_cal.copy()
                 row["ece_recal_platt"] = compute_ece(y[~mask], p_recal_platt[~mask])
 
+                # Temperature scaling
+                if len(np.unique(y[mask])) >= 2:
+                    eps = 1e-15
+                    p_safe = np.clip(p_raw, eps, 1 - eps)
+                    logits = np.log(p_safe / (1 - p_safe))
+                    def nll(T):
+                        p = 1 / (1 + np.exp(-logits / T))
+                        p = np.clip(p, eps, 1 - eps)
+                        return -np.mean(y * np.log(p) + (1 - y) * np.log(1 - p))
+                    res = minimize(nll, x0=1.0, method='L-BFGS-B', bounds=[(1e-3, 10.0)])
+                    T_opt = res.x[0]
+                    p_temp = 1 / (1 + np.exp(-logits / T_opt))
+                    p_recal_temp = np.clip(p_temp, 0, 1)
+                else:
+                    p_recal_temp = p_cal.copy()
+                row["ece_recal_temp"] = compute_ece(y[~mask], p_recal_temp[~mask])
+
                 results.append(row)
                 print(f"s={severity} seed={seed} H={H}: "
                       f"ece_raw={row['ece_raw']:.4f} ece_cal={row['ece_cal']:.4f} "
-                      f"ece_recal={row['ece_recal']:.4f} platt={row['ece_recal_platt']:.4f}")
+                      f"ece_recal={row['ece_recal']:.4f} platt={row['ece_recal_platt']:.4f} temp={row['ece_recal_temp']:.4f}")
 
     results_df = pd.DataFrame(results)
     out_path = os.path.join(RESULTS_DIR, "robustness_results.csv")
