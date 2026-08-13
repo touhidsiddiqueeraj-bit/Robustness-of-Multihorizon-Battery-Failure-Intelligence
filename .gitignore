@@ -1,5 +1,5 @@
 # Raw data — raw .mat files must be downloaded separately
-data/nasa/*.mat
+data/nasa/**/*.mat
 data/synthetic/*.csv
 
 # Deleted from repo; left on disk for reference
