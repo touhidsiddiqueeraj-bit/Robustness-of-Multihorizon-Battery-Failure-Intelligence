@@ -8,13 +8,10 @@ import matplotlib.pyplot as plt
 BASE = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 FIGS_DIR = os.path.join(BASE, "figs")
 RESULTS_DIR = os.path.join(BASE, "results")
+from plot_style import apply_style
+apply_style()
 
 PRIMARY_H = 20
-plt.rcParams.update({
-    "font.family": "serif", "font.size": 11,
-    "axes.labelsize": 12, "axes.titlesize": 13,
-    "legend.fontsize": 10, "figure.dpi": 150,
-})
 
 def main():
     df = pd.read_csv(os.path.join(RESULTS_DIR, "robustness_results_sweep.csv"))
@@ -52,7 +49,7 @@ def main():
 
     plt.tight_layout()
     out = os.path.join(FIGS_DIR, "F_Sample_Sweep.png")
-    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(out, bbox_inches="tight")
     print(f"Saved: {out}")
 
 

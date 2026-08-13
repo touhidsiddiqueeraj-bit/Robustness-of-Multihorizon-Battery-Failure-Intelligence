@@ -23,6 +23,13 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
+# Scratch / process artifacts
+hi_p4-4.png
+fig1v_reliability.png
+audit.txt
+paper_layout.txt
+**/.~lock.*#
+
 # LaTeX build
 *.aux
 *.log

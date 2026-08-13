@@ -6,6 +6,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from plot_style import apply_style
+apply_style()
+
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE, "data")
 FIGS_DIR = os.path.join(BASE, "figs")
@@ -32,27 +35,29 @@ pal = [COLORS[c] for c in order]
 
 parts = sns.violinplot(data=df, x="condition", y="min_voltage", order=order, palette=pal, ax=ax, cut=0, inner="quartile", linewidth=1.2)
 ax.set_xlabel("")
-ax.set_ylabel("Minimum voltage (V)", fontsize=13)
-ax.tick_params(labelsize=12)
+ax.set_ylabel("Minimum voltage (V)", fontsize=16)
+ax.tick_params(labelsize=13)
 
 # annotate the clean and S1 means
 means = df.groupby("condition")["min_voltage"].mean()
-ax.annotate(f"{means['Clean']:.2f}V", xy=(0, means['Clean']), xytext=(0.3, means['Clean']+0.1),
-            fontsize=12, fontweight="bold", color=COLORS["Clean"],
+ax.annotate(f"{means['Clean']:.2f}V", xy=(0, means['Clean']), xytext=(0.44, means['Clean']-0.25),
+            fontsize=13, fontweight="bold", color=COLORS["Clean"],
+            bbox=dict(fc="white", ec="none", alpha=0.8, pad=1.5),
             arrowprops=dict(arrowstyle="->", color=COLORS["Clean"], lw=1.5))
-ax.annotate(f"{means['S1']:.2f}V", xy=(1, means['S1']), xytext=(0.7, means['S1']+0.1),
-            fontsize=12, fontweight="bold", color=COLORS["S1"],
+ax.annotate(f"{means['S1']:.2f}V", xy=(1, means['S1']), xytext=(0.70, means['S1']+0.10),
+            fontsize=13, fontweight="bold", color=COLORS["S1"],
+            bbox=dict(fc="white", ec="none", alpha=0.8, pad=1.5),
             arrowprops=dict(arrowstyle="->", color=COLORS["S1"], lw=1.5))
 
 # bracket showing the gap
 ax.annotate("", xy=(0, means['Clean']), xytext=(1, means['S1']),
             arrowprops=dict(arrowstyle="<->", color="#64748b", lw=1.5))
-ax.text(0.5, max(means['Clean'], means['S1']) + 0.55, f"+{(means['S1']/means['Clean'] - 1)*100:.0f}%", ha="center", fontsize=14, fontweight="bold", color="#64748b")
+ax.text(0.5, max(means['Clean'], means['S1']) + 0.55, f"+{(means['S1']/means['Clean'] - 1)*100:.0f}%", ha="center", fontsize=15, fontweight="bold", color="#334155", bbox=dict(fc="white", ec="#64748b", lw=1, pad=2))
 
-ax.set_title("Minimum voltage shift across severity levels", fontsize=15, fontweight="bold", pad=14)
+ax.set_title("Minimum voltage shift across severity levels", fontsize=17, fontweight="bold", pad=14)
 sns.despine()
 plt.tight_layout()
 out = os.path.join(FIGS_DIR, "F_Distribution_Vmin.png")
-fig.savefig(out, dpi=200, bbox_inches="tight")
+fig.savefig(out, bbox_inches="tight")
 print(f"Saved: {out}")
 plt.close()

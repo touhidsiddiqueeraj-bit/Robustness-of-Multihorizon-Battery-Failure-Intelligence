@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 BASE = os.path.dirname(os.path.abspath(__file__))
 FIGS = os.path.normpath(os.path.join(BASE, "..", "figs"))
 RESULTS = os.path.normpath(os.path.join(BASE, "..", "results"))
+from plot_style import apply_style
+apply_style()
 
 std = pd.read_csv(os.path.join(RESULTS, "robustness_results.csv"))
 dr = pd.read_csv(os.path.join(RESULTS, "domain_rand_results.csv"))
@@ -23,7 +25,7 @@ width = 0.35
 # DR model ECE is isotonic-recalibrated, compare vs std isotonic (ece_recal)
 for ax, (std_col, dr_col, label) in zip(axes, [
     ("ece_recal", "dr_ece_cal", "ECE"),
-    ("auc_cal", "dr_auc_cal", "AUC"),
+    ("auc_recal", "dr_auc_cal", "AUC"),
 ]):
     colors_s = plt.cm.Greys(np.linspace(0.3, 0.8, len(SEVERITIES)))
 
@@ -53,10 +55,10 @@ for ax, (std_col, dr_col, label) in zip(axes, [
     ax.set_ylabel(label)
     ax.set_title(f"{label}: Standard (isotonic) vs Domain-Randomized")
     if label == "ECE":
-        ax.legend(fontsize=7, ncol=2)
+        ax.legend(fontsize=11, ncol=2)
 
 plt.tight_layout()
 out = os.path.join(FIGS, "F_DR_Comparison.png")
-plt.savefig(out, dpi=200, bbox_inches="tight")
+plt.savefig(out, bbox_inches="tight")
 plt.close()
 print(f"Saved: {out}")
